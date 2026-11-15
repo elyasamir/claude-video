@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --cream: #f4efe8; --paper: #fbf8f3; --ink: #2b2622; --soft: #7d736b; --line: #ddd4c9;
+        --fire: #c9643f; --volt: #b8920f; --leaf: #6f8f5c;
+        --serif: "Fraunces", Georgia, serif; --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--cream); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--cream); font-family: var(--sans); color: var(--ink); }
+
+      #topbar { position: absolute; left: 60px; top: 40px; width: 960px; height: 50px; display: flex; justify-content: space-between; align-items: center; }
+      #topbar .l { font-size: 28px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--soft); font-weight: 500; }
+      #topbar .r { font-family: var(--serif); font-style: italic; font-size: 34px; }
+      #dots { display: flex; gap: 10px; align-items: center; }
+      #dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--line); display: block; }
+
+      #frame { position: absolute; left: 60px; top: 106px; width: 960px; height: 1707px; border-radius: 36px; overflow: hidden; background: #ddd; box-shadow: 0 20px 50px rgba(60,40,20,0.12); }
+      #frame video { position: absolute; left: 0; top: 0; width: 960px; height: 1707px; object-fit: cover; }
+      #shade { position: absolute; left: 0; right: 0; bottom: 0; height: 620px; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(25,18,12,0.55) 100%); }
+
+      /* intro title (bottom of the first shot) */
+      #intro { position: absolute; left: 70px; bottom: 90px; width: 820px; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.35); }
+      #intro .kick { font-size: 28px; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 600; opacity: 0; }
+      #intro .name { font-family: var(--serif); font-style: italic; font-size: 112px; line-height: 1.02; margin-top: 10px; opacity: 0; }
+      #intro .sub { margin-top: 16px; font-size: 36px; font-weight: 500; opacity: 0; }
+
+      /* character labels */
+      .lab { position: absolute; left: 70px; bottom: 90px; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.35); }
+      .lab small { display: block; font-size: 28px; letter-spacing: 0.22em; font-weight: 600; opacity: 0; }
+      .lab b { display: block; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 120px; line-height: 1.05; opacity: 0; }
+      .lab span { display: inline-flex; align-items: center; gap: 12px; margin-top: 14px; padding: 10px 22px; border-radius: 999px;
+        background: rgba(251,248,243,0.92); color: var(--ink); font-size: 30px; font-weight: 600; text-shadow: none; opacity: 0; }
+      .lab span i { width: 14px; height: 14px; border-radius: 50%; display: block; }
+
+      /* end card */
+      #end { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: 0; }
+      .tile { position: absolute; top: 330px; width: 290px; height: 516px; border-radius: 30px; overflow: hidden; background: #ddd; box-shadow: 0 16px 40px rgba(60,40,20,0.14); opacity: 0; }
+      .tile video { position: absolute; left: 0; top: 0; width: 290px; height: 516px; object-fit: cover; }
+      .tname { position: absolute; top: 870px; width: 290px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 40px; opacity: 0; }
+      #end .title { position: absolute; left: 0; top: 1010px; width: 1080px; text-align: center; font-family: var(--serif); font-size: 104px; line-height: 1; opacity: 0; }
+      #end .title em { font-style: italic; }
+      #end .q { position: absolute; left: 0; top: 1150px; width: 1080px; text-align: center; font-size: 40px; font-weight: 500; color: var(--soft); opacity: 0; }
+      #end .chips { position: absolute; left: 0; top: 1240px; width: 1080px; display: flex; justify-content: center; gap: 16px; }
+      #end .chips div { padding: 12px 24px; border-radius: 999px; border: 1.5px solid var(--line); font-size: 30px; font-weight: 500; opacity: 0; }
+      #end .cta { position: absolute; left: 50%; top: 1380px; transform: translateX(-50%); padding: 24px 56px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 36px; font-weight: 600; white-space: nowrap; opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="14.6" data-width="1080" data-height="1920">
+      <div id="topbar" data-layout-allow-safe-zone>
+        <div class="l">koleksi keychain</div>
+        <div id="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
+        <div class="r">Pokémon</div>
+      </div>
+
+      <div id="frame">
+        <!-- the four shots, slightly trimmed at the hand-overs; original room sound muted for the TikTok track -->
+        <video id="v0" class="clip" src="assets/raw.mp4" data-start="0"    data-duration="2.7"  data-media-start="0"    muted playsinline></video>
+        <video id="v1" class="clip" src="assets/raw.mp4" data-start="2.7"  data-duration="2.7"  data-media-start="2.75" muted playsinline></video>
+        <video id="v2" class="clip" src="assets/raw.mp4" data-start="5.4"  data-duration="2.45" data-media-start="6.0"  muted playsinline></video>
+        <video id="v3" class="clip" src="assets/raw.mp4" data-start="7.85" data-duration="3.4" data-media-start="8.5" muted playsinline></video>
+        <div id="shade"></div>
+
+        <div id="intro">
+          <div class="kick">koleksi comel</div>
+          <div class="name">Keychain Pokémon</div>
+          <div class="sub">3 design · siap dengan tali tangan</div>
+        </div>
+
+        <div class="lab" id="l1"><small>01 / 03</small><b>Fuecoco</b><span><i style="background:var(--fire)"></i>jenis api</span></div>
+        <div class="lab" id="l2"><small>02 / 03</small><b>Pikachu</b><span><i style="background:var(--volt)"></i>jenis elektrik</span></div>
+        <div class="lab" id="l3"><small>03 / 03</small><b>Sprigatito</b><span><i style="background:var(--leaf)"></i>jenis rumput</span></div>
+      </div>
+
+      <div id="end" data-layout-allow-safe-zone>
+        <div class="tile" id="e1" style="left:80px"><video id="ev1" class="clip" src="assets/raw.mp4" data-start="11.3" data-duration="3.1" data-media-start="2.8" muted playsinline></video><video id="ev1b" class="clip" src="assets/raw.mp4" data-start="14.4" data-duration="0.2" data-media-start="5.6" muted playsinline></video></div>
+        <div class="tile" id="e2" style="left:395px"><video id="ev2" class="clip" src="assets/raw.mp4" data-start="11.3" data-duration="2.4" data-media-start="6.02" muted playsinline></video><video id="ev2b" class="clip" src="assets/raw.mp4" data-start="13.7" data-duration="0.9" data-media-start="7.0" muted playsinline></video></div>
+        <div class="tile" id="e3" style="left:710px"><video id="ev3" class="clip" src="assets/raw.mp4" data-start="11.3" data-duration="3.3" data-media-start="8.55" muted playsinline></video></div>
+        <div class="tname" id="n1" style="left:80px">Fuecoco</div>
+        <div class="tname" id="n2" style="left:395px">Pikachu</div>
+        <div class="tname" id="n3" style="left:710px">Sprigatito</div>
+        <div class="title">Keychain <em>Pokémon</em></div>
+        <div class="q">Mana satu favourite korang?</div>
+        <div class="chips"><div>3 design</div><div>tali tangan</div><div>charm pokéball</div></div>
+        <div class="cta">Dapatkan sekarang →</div>
+      </div>
+
+      <audio id="s0" src="assets/sfx/whoosh.wav" data-start="0" data-duration="0.55" data-volume="0.25"></audio>
+      <audio id="s1" src="assets/sfx/pop.wav" data-start="0.5" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s2" src="assets/sfx/swipe.wav" data-start="2.62" data-duration="0.28" data-volume="0.2"></audio>
+      <audio id="s3" src="assets/sfx/pop.wav" data-start="2.95" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s4" src="assets/sfx/swipe.wav" data-start="5.32" data-duration="0.28" data-volume="0.2"></audio>
+      <audio id="s5" src="assets/sfx/pop.wav" data-start="5.65" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s6" src="assets/sfx/swipe.wav" data-start="7.77" data-duration="0.28" data-volume="0.2"></audio>
+      <audio id="s7" src="assets/sfx/pop.wav" data-start="8.1" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s8" src="assets/sfx/whoosh.wav" data-start="11.2" data-duration="0.55" data-volume="0.25"></audio>
+      <audio id="s9" src="assets/sfx/pop.wav" data-start="11.55" data-duration="0.16" data-volume="0.18"></audio>
+      <audio id="s10" src="assets/sfx/pop.wav" data-start="11.7" data-duration="0.16" data-volume="0.18"></audio>
+      <audio id="s11" src="assets/sfx/pop.wav" data-start="11.85" data-duration="0.16" data-volume="0.18"></audio>
+      <audio id="s12" src="assets/sfx/ding.wav" data-start="12.9" data-duration="1.6" data-volume="0.16"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // intro
+      tl.fromTo("#frame", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 0);
+      tl.fromTo("#topbar", { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+      tl.fromTo("#intro .kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.3);
+      tl.fromTo("#intro .name", { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.45);
+      tl.fromTo("#intro .sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.8);
+      tl.to("#intro", { opacity: 0, y: 20, duration: 0.3, ease: "power2.in" }, 2.4);
+
+      // subtle settle on every cut so the jump reads as intentional
+      [0, 2.7, 5.4, 7.85].forEach((t, i) => {
+        tl.fromTo("#v" + i, { scale: 1.06 }, { scale: 1, duration: 1.2, ease: "power2.out", immediateRender: false }, t);
+      });
+
+      // character labels + progress dots
+      function lab(sel, dot, t, out, colour) {
+        tl.fromTo(sel + " small", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, t);
+        tl.fromTo(sel + " b", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, t + 0.08);
+        tl.fromTo(sel + " span", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, t + 0.3);
+        tl.to(sel, { opacity: 0, y: 16, duration: 0.25, ease: "power2.in" }, out);
+        tl.to(dot, { backgroundColor: colour, scale: 1.3, duration: 0.3, ease: "back.out(3)" }, t);
+        tl.to(dot, { scale: 1, duration: 0.2 }, t + 0.3);
+      }
+      lab("#l1", "#d1", 2.9, 5.15, "#c9643f");
+      lab("#l2", "#d2", 5.6, 7.6, "#b8920f");
+      lab("#l3", "#d3", 8.05, 11.0, "#6f8f5c");
+
+      // end card
+      tl.to("#frame", { opacity: 0, scale: 0.94, duration: 0.45, ease: "power2.in" }, 11.15);
+      tl.to("#dots", { opacity: 0, duration: 0.3 }, 11.15);
+      tl.set("#end", { opacity: 1 }, 11.3);
+      tl.fromTo(".tile", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.6, stagger: 0.15, ease: "power3.out" }, 11.4);
+      tl.fromTo(".tname", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.15, ease: "power2.out" }, 11.7);
+      tl.fromTo("#end .title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 12.0);
+      tl.fromTo("#end .q", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 12.3);
+      tl.fromTo("#end .chips div", { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: "power2.out" }, 12.5);
+      tl.fromTo("#end .cta", { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 12.9);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
