@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #070b18; --ground-2: #0f1a36; --ink: #ffffff; --muted: #9fb0d4;
+        --accent: #facc15; --buy: #22c55e; --sell: #ef4444; --blue: #3b82f6; --orange: #fb923c;
+        --font: "Poppins", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font); color: var(--ink);
+        background:
+          radial-gradient(900px 700px at 50% 40%, #1b2d5c 0%, rgba(27,45,92,0) 70%),
+          linear-gradient(180deg, var(--ground-2) 0%, var(--ground) 100%);
+      }
+      #bg-grid { position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+        background-size: 60px 60px; }
+
+      #header { position: absolute; left: 0; top: 140px; width: 1080px; text-align: center; }
+      #kicker { display: inline-block; padding: 8px 22px; border-radius: 999px; background: rgba(250,204,21,0.14);
+        border: 2px solid rgba(250,204,21,0.55); color: var(--accent); font-weight: 700; font-size: 28px; letter-spacing: 0.18em; }
+      #title { margin-top: 12px; font-size: 62px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+      #title .hl { color: var(--accent); }
+      #step { position: absolute; left: 50%; top: 296px; height: 58px; transform: translateX(-50%);
+        display: flex; align-items: center; gap: 14px; padding: 0 26px 0 8px; border-radius: 999px;
+        background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.16); white-space: nowrap; }
+      #step-num { width: 44px; height: 44px; border-radius: 50%; background: var(--blue); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 28px; }
+      #step-text { font-weight: 700; font-size: 28px; position: relative; height: 40px; line-height: 40px; width: 300px; text-align: left; }
+      #step-text span { position: absolute; left: 0; top: 0; white-space: nowrap; opacity: 0; }
+
+      #phone { position: absolute; left: 234px; top: 384px; width: 612px; height: 1306px; border-radius: 50px; background: #05070d; padding: 8px;
+        box-shadow: 0 40px 90px rgba(0,0,0,0.6), 0 0 0 2px rgba(255,255,255,0.12), 0 0 80px rgba(59,130,246,0.25); }
+      #screen { position: relative; width: 596px; height: 1290px; border-radius: 42px; overflow: hidden; background: #fff; }
+      #stage { position: absolute; left: 0; top: 0; width: 384px; height: 832px; transform-origin: 0 0; transform: scale(1.55208, 1.55048); }
+      #stage video { position: absolute; left: 0; top: 0; width: 384px; height: 832px; object-fit: fill; }
+
+      .box { position: absolute; border-radius: 9px; border: 3px solid var(--accent); box-shadow: 0 0 16px rgba(250,204,21,0.9); opacity: 0; }
+      .box.green { border-color: var(--buy); box-shadow: 0 0 18px rgba(34,197,94,0.95); }
+      .ripple { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+        border: 3px solid rgba(59,130,246,0.95); background: rgba(59,130,246,0.25); opacity: 0; }
+      #finger { position: absolute; left: 0; top: 0; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%;
+        background: rgba(59,130,246,0.45); border: 3px solid #fff; box-shadow: 0 0 20px rgba(59,130,246,0.9); opacity: 0; }
+
+      /* contract-code card, laid over the keyboard (screen pixels) */
+      #code { position: absolute; left: 18px; top: 905px; width: 560px; padding: 18px 16px 22px; border-radius: 26px;
+        background: rgba(9,14,32,0.96); border: 2px solid rgba(250,204,21,0.6); text-align: center; opacity: 0; box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
+      #code .lbl { font-size: 28px; font-weight: 700; color: var(--muted); letter-spacing: 0.08em; }
+      #code .row { display: flex; justify-content: center; gap: 12px; margin-top: 12px; }
+      #code .part { display: flex; flex-direction: column; align-items: center; min-width: 120px; padding: 10px 12px; border-radius: 18px; background: rgba(255,255,255,0.07); opacity: 0; }
+      #code .part b { font-size: 46px; font-weight: 900; color: var(--accent); line-height: 1.05; }
+      #code .part small { font-size: 28px; font-weight: 600; color: #dbe4ff; }
+      #code .note { margin-top: 12px; font-size: 28px; font-weight: 600; color: var(--muted); opacity: 0; }
+
+      .side { position: absolute; width: 196px; padding: 10px 14px; border-radius: 14px; background: var(--accent); color: #111;
+        font-weight: 900; font-size: 28px; line-height: 1.05; box-shadow: 0 10px 24px rgba(0,0,0,0.45); opacity: 0; }
+      .side small { display: block; font-size: 28px; font-weight: 700; opacity: 0.75; margin-top: 4px; }
+      .side.r { left: 868px; }
+      .side.r::before { content: ""; position: absolute; left: -14px; top: 50%; margin-top: -12px; border-style: solid;
+        border-width: 12px 14px 12px 0; border-color: transparent var(--accent) transparent transparent; }
+      .side.l { left: 18px; text-align: right; }
+      .side.l::after { content: ""; position: absolute; right: -14px; top: 50%; margin-top: -12px; border-style: solid;
+        border-width: 12px 0 12px 14px; border-color: transparent transparent transparent var(--accent); }
+      .side.green { background: var(--buy); } .side.green::before { border-right-color: var(--buy); }
+
+      #captions { position: absolute; left: 90px; top: 1716px; width: 900px; height: 150px; }
+      .cap { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: max-content; max-width: 900px; text-align: center; opacity: 0;
+        padding: 10px 26px 14px; border-radius: 26px; background: rgba(7,11,24,0.86); border: 2px solid rgba(255,255,255,0.12);
+        font-weight: 800; font-size: 46px; line-height: 1.16; }
+      .cap em { font-style: normal; color: var(--accent); }
+
+      #outro { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: 0; }
+      #o-pre { position: absolute; left: 0; top: 760px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #o-url { position: absolute; left: 50%; top: 850px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; padding: 30px 50px 30px 34px;
+        border-radius: 999px; background: #fff; color: #0b1020; box-shadow: 0 30px 80px rgba(250,204,21,0.35), 0 0 0 6px rgba(250,204,21,0.5); white-space: nowrap; }
+      #o-url .globe { width: 76px; height: 76px; border-radius: 50%; background: var(--buy); position: relative; flex: none; box-shadow: inset 0 0 0 5px #15803d; }
+      #o-url .globe::before, #o-url .globe::after { content: ""; position: absolute; border: 4px solid #fff; border-radius: 50%; }
+      #o-url .globe::before { left: 22px; right: 22px; top: 8px; bottom: 8px; }
+      #o-url .globe::after { left: 8px; right: 8px; top: 30px; bottom: 30px; border-radius: 4px; border-width: 4px 0; }
+      #o-url b { font-size: 84px; font-weight: 900; letter-spacing: -0.02em; }
+      #o-url b span { color: #16a34a; }
+      #o-sub { position: absolute; left: 90px; top: 1070px; width: 900px; text-align: center; font-size: 40px; font-weight: 800; line-height: 1.25; }
+      #o-sub em { font-style: normal; color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="24.2" data-width="1080" data-height="1920">
+      <div id="bg-grid"></div>
+      <div id="header" data-layout-allow-safe-zone>
+        <div id="kicker">TUTORIAL QST</div>
+        <div id="title">Cara Buat <span class="hl">WATCHLIST</span></div>
+      </div>
+      <div id="step" data-layout-allow-safe-zone>
+        <div id="step-num">1</div>
+        <div id="step-text">
+          <span id="st1">Add new page</span>
+          <span id="st2">Swipe ke page baru</span>
+          <span id="st3">Add instrument</span>
+          <span id="st4">Taip kod kontrak</span>
+          <span id="st5">Siap!</span>
+        </div>
+      </div>
+
+      <div id="phone">
+        <div id="screen">
+          <div id="stage">
+            <!-- silent screen recording: idle stretches and two mis-taps cut out -->
+            <video id="v0" class="clip" src="assets/raw.mp4" data-start="0"     data-duration="2.5"  data-media-start="0.3"   muted playsinline></video>
+            <video id="v1" class="clip" src="assets/raw.mp4" data-start="2.5"   data-duration="1.7"  data-media-start="12.9"  muted playsinline></video>
+            <video id="v2" class="clip" src="assets/raw.mp4" data-start="4.2"   data-duration="3.05" data-media-start="15.9"  muted playsinline></video>
+            <video id="v3" class="clip" src="assets/raw.mp4" data-start="7.25"  data-duration="1.05" data-media-start="19.55" muted playsinline></video>
+            <video id="v4" class="clip" src="assets/raw.mp4" data-start="8.3"   data-duration="1.45" data-media-start="25.15" muted playsinline></video>
+            <video id="v5" class="clip" src="assets/raw.mp4" data-start="9.75"  data-duration="1.2"  data-media-start="28.3"  muted playsinline></video>
+            <video id="v6" class="clip" src="assets/raw.mp4" data-start="10.95" data-duration="4.0"  data-media-start="30.3"  muted playsinline></video>
+            <video id="v7" class="clip" src="assets/raw.mp4" data-start="14.95" data-duration="2.2"  data-media-start="35.4"  muted playsinline></video>
+            <video id="v8" class="clip" src="assets/raw.mp4" data-start="17.15" data-duration="3.0"  data-media-start="41.1"  muted playsinline></video>
+
+            <!-- callouts in recording pixels (384x832) -->
+            <div class="box" id="bx-page" style="left:48px; top:57px; width:32px; height:32px"></div>
+            <div class="ripple" id="rp-page" style="left:64px; top:73px"></div>
+            <div class="box" id="bx-name" style="left:12px; top:148px; width:280px; height:36px"></div>
+            <div class="box" id="bx-done1" style="left:326px; top:63px; width:52px; height:26px"></div>
+            <div class="ripple" id="rp-done1" style="left:352px; top:76px"></div>
+            <div id="finger"></div>
+            <div class="box" id="bx-tab" style="left:126px; top:58px; width:96px; height:36px"></div>
+            <div class="box" id="bx-add" style="left:341px; top:58px; width:31px; height:31px"></div>
+            <div class="ripple" id="rp-add" style="left:356px; top:73px"></div>
+            <div class="box" id="bx-field" style="left:14px; top:138px; width:230px; height:38px"></div>
+            <div class="box" id="bx-done2" style="left:326px; top:70px; width:52px; height:26px"></div>
+            <div class="ripple" id="rp-done2" style="left:352px; top:83px"></div>
+            <div class="box green" id="bx-row" style="left:2px; top:172px; width:380px; height:82px"></div>
+            <div class="ripple" id="rp-row" style="left:200px; top:212px"></div>
+          </div>
+
+          <div id="code">
+            <div class="lbl">KOD KONTRAK</div>
+            <div class="row">
+              <div class="part" id="cp1"><b>MPC</b><small>FCPO</small></div>
+              <div class="part" id="cp2"><b>F</b><small>Januari</small></div>
+              <div class="part" id="cp3"><b>27</b><small>2027</small></div>
+            </div>
+            <div class="note" id="cnote">guna kontrak aktif semasa</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- side labels: top = 392 + y*1.55 - half label height -->
+      <div class="side l" id="tg-page" style="top:470px">ADD NEW PAGE</div>
+      <div class="side r" id="tg-name" style="top:612px">NAMA PAGE<small>watchlist</small></div>
+      <div class="side r" id="tg-tab" style="top:468px">PAGE BARU</div>
+      <div class="side r" id="tg-add" style="top:470px">ADD INSTRU&shy;MENT</div>
+      <div class="side r" id="tg-field" style="top:598px">MPCF27<small>contoh</small></div>
+      <div class="side r green" id="tg-row" style="top:686px">SIAP ✓<small>MPCF27</small></div>
+
+      <div id="captions">
+        <div class="cap" id="c0">Cara buat <em>watchlist</em> di <em>QST</em></div>
+        <div class="cap" id="c1">Tekan ikon <em>+</em> atas, ke-2 dari kiri</div>
+        <div class="cap" id="c2">Namakan <em>watchlist</em>, tekan <em>Done</em></div>
+        <div class="cap" id="c3"><em>Swipe</em> ke page baru</div>
+        <div class="cap" id="c4">Tekan ikon <em>+</em> atas kanan</div>
+        <div class="cap" id="c5">Taip kod kontrak, cth <em>MPCF27</em></div>
+        <div class="cap" id="c6">Tekan <em>Done</em>. Siap!</div>
+        <div class="cap" id="c7">Tekan untuk tengok <em>harga live</em></div>
+      </div>
+
+      <div id="outro" data-layout-allow-safe-zone>
+        <div id="o-pre">Belajar trade FCPO bersama</div>
+        <div id="o-url"><div class="globe"></div><b>trader<span>sawit</span>.com</b></div>
+        <div id="o-sub">Follow untuk lebih banyak <em>tips trading</em></div>
+      </div>
+
+      <!-- sound effects -->
+      <audio id="a0" src="assets/sfx/impact.wav" data-start="0.05" data-duration="1.2" data-volume="0.5"></audio>
+      <audio id="a1" src="assets/sfx/whoosh.wav" data-start="0" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a2" src="assets/sfx/pop.wav" data-start="2.55" data-duration="0.16" data-volume="0.45"></audio>
+      <audio id="a3" src="assets/sfx/click.wav" data-start="3.45" data-duration="0.06" data-volume="0.6"></audio>
+      <audio id="a4" src="assets/sfx/pop.wav" data-start="4.3" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="a5" src="assets/sfx/click.wav" data-start="7.3" data-duration="0.06" data-volume="0.6"></audio>
+      <audio id="a6" src="assets/sfx/swipe.wav" data-start="8.7" data-duration="0.28" data-volume="0.5"></audio>
+      <audio id="a7" src="assets/sfx/pop.wav" data-start="9.2" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="a8" src="assets/sfx/click.wav" data-start="10.25" data-duration="0.06" data-volume="0.6"></audio>
+      <audio id="a9" src="assets/sfx/pop.wav" data-start="12.2" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="a10" src="assets/sfx/pop.wav" data-start="13.0" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="a11" src="assets/sfx/pop.wav" data-start="13.8" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="a12" src="assets/sfx/click.wav" data-start="15.4" data-duration="0.06" data-volume="0.6"></audio>
+      <audio id="a13" src="assets/sfx/ding.wav" data-start="15.5" data-duration="1.6" data-volume="0.4"></audio>
+      <audio id="a14" src="assets/sfx/click.wav" data-start="17.5" data-duration="0.06" data-volume="0.6"></audio>
+      <audio id="a15" src="assets/sfx/whoosh.wav" data-start="19.6" data-duration="0.55" data-volume="0.5"></audio>
+      <audio id="a16" src="assets/sfx/impact.wav" data-start="19.8" data-duration="1.2" data-volume="0.45"></audio>
+      <audio id="a17" src="assets/sfx/ding.wav" data-start="20.35" data-duration="1.6" data-volume="0.4"></audio>
+      <!-- soft key taps while typing -->
+      <audio id="k0" src="assets/sfx/click.wav" data-start="4.37" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k1" src="assets/sfx/click.wav" data-start="4.57" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k2" src="assets/sfx/click.wav" data-start="5.77" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k3" src="assets/sfx/click.wav" data-start="5.97" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k4" src="assets/sfx/click.wav" data-start="6.17" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k5" src="assets/sfx/click.wav" data-start="6.4" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k6" src="assets/sfx/click.wav" data-start="6.6" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k7" src="assets/sfx/click.wav" data-start="6.93" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k8" src="assets/sfx/click.wav" data-start="11.68" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k9" src="assets/sfx/click.wav" data-start="12.38" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k10" src="assets/sfx/click.wav" data-start="13.05" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k11" src="assets/sfx/click.wav" data-start="13.42" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k12" src="assets/sfx/click.wav" data-start="13.78" data-duration="0.06" data-volume="0.18"></audio>
+      <audio id="k13" src="assets/sfx/click.wav" data-start="14.25" data-duration="0.06" data-volume="0.18"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const EDIT_END = 20.15;
+
+      // intro
+      tl.fromTo("#kicker", { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+      tl.fromTo("#title", { opacity: 0, scale: 1.6, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.out" }, 0.05);
+      tl.fromTo("#phone", { y: 900, rotation: 4, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 0);
+      tl.fromTo("#step", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 2.5);
+
+      // step chip
+      const STEPS = [[2.5, 1], [8.3, 2], [9.75, 3], [10.95, 4], [14.95, 5]];
+      tl.set("#step-num", { textContent: 1 }, 0);
+      STEPS.forEach(([t, n], i) => {
+        if (i > 0) tl.to(`#st${STEPS[i - 1][1]}`, { opacity: 0, y: -24, duration: 0.18, ease: "power2.in" }, t - 0.05);
+        tl.fromTo(`#st${n}`, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, t + 0.1);
+        tl.set("#step-num", { textContent: n === 5 ? "✓" : n, backgroundColor: n === 5 ? "#15803d" : "#3b82f6" }, t + 0.1);
+        tl.fromTo("#step-num", { scale: 1.5 }, { scale: 1, duration: 0.3, ease: "back.out(3)", immediateRender: false }, t + 0.1);
+      });
+
+      // captions
+      [["#c0", 0.3, 2.45], ["#c1", 2.5, 4.15], ["#c2", 4.2, 8.25], ["#c3", 8.3, 9.7], ["#c4", 9.75, 10.9],
+       ["#c5", 10.95, 14.9], ["#c6", 14.95, 17.1], ["#c7", 17.15, 19.6]].forEach(([s, a, b]) => {
+        tl.fromTo(s, { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.18, ease: "back.out(2)" }, a);
+        tl.to(s, { opacity: 0, duration: 0.06 }, b);
+      });
+
+      // helpers
+      [".box", ".ripple", ".side", "#finger"].forEach((s) => tl.set(s, { opacity: 0 }, 0));
+      const boxIn = (s, t, out) => { tl.fromTo(s, { opacity: 0, scale: 1.35 }, { opacity: 1, scale: 1, duration: 0.22, ease: "back.out(2)", immediateRender: false }, t); tl.to(s, { opacity: 0, duration: 0.15 }, out); };
+      const sideIn = (s, t, out, dx = 40) => { tl.fromTo(s, { opacity: 0, x: dx }, { opacity: 1, x: 0, duration: 0.25, ease: "back.out(2.2)", immediateRender: false }, t); tl.to(s, { opacity: 0, duration: 0.15 }, out); };
+      const ripple = (s, t) => tl.fromTo(s, { opacity: 0.95, scale: 0.4 }, { opacity: 0, scale: 2.4, duration: 0.5, ease: "power2.out", immediateRender: false }, t);
+
+      // step 1: + (second from left) -> Add new page, name it, Done
+      boxIn("#bx-page", 2.6, 3.6); sideIn("#tg-page", 2.65, 4.15, -40); ripple("#rp-page", 3.45);
+      boxIn("#bx-name", 4.3, 6.95); sideIn("#tg-name", 4.4, 7.4);
+      boxIn("#bx-done1", 6.95, 7.45); ripple("#rp-done1", 7.3);
+
+      // step 2: swipe to the new page (finger sweeps right -> left)
+      tl.set("#finger", { x: 320, y: 420 }, 8.35);
+      tl.to("#finger", { opacity: 1, duration: 0.15 }, 8.4);
+      tl.to("#finger", { x: 70, duration: 0.45, ease: "power2.inOut" }, 8.6);
+      tl.to("#finger", { opacity: 0, duration: 0.2 }, 9.05);
+      boxIn("#bx-tab", 9.2, 9.72); sideIn("#tg-tab", 9.2, 9.72);
+
+      // step 3: + top right -> Add new instrument
+      boxIn("#bx-add", 9.8, 10.5); sideIn("#tg-add", 9.8, 10.9); ripple("#rp-add", 10.25);
+
+      // step 4: type the contract code, Done
+      boxIn("#bx-field", 11.05, 14.9); sideIn("#tg-field", 11.1, 14.9);
+      tl.fromTo("#code", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(1.8)" }, 12.1);
+      [["#cp1", 12.2], ["#cp2", 13.0], ["#cp3", 13.8]].forEach(([s, t]) => tl.fromTo(s, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.25, ease: "back.out(2)" }, t));
+      tl.fromTo("#cnote", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 14.1);
+      tl.to("#code", { opacity: 0, y: 40, duration: 0.2 }, 14.85);
+      boxIn("#bx-done2", 15.0, 15.6); ripple("#rp-done2", 15.4);
+
+      // done: the new row
+      boxIn("#bx-row", 15.55, 17.45); sideIn("#tg-row", 15.6, 17.45);
+      ripple("#rp-row", 17.5);
+
+      // outro: tradersawit.com
+      tl.to(["#phone", "#step", "#captions"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 19.6);
+      tl.set("#outro", { opacity: 1 }, EDIT_END - 0.25);
+      tl.fromTo("#o-pre", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 20.0);
+      tl.fromTo("#o-url", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 20.15);
+      tl.fromTo("#o-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 20.75);
+      tl.to("#o-url", { scale: 1.05, duration: 0.45, yoyo: true, repeat: 3, ease: "sine.inOut" }, 21.2);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
