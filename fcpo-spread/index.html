@@ -91,15 +91,26 @@
         border: 3px solid rgba(59,130,246,0.95); background: rgba(59,130,246,0.25); opacity: 0;
       }
       .tag {
-        position: absolute; padding: 3px 9px; border-radius: 7px; font-weight: 800; font-size: 15px;
+        position: absolute; padding: 3px 9px; border-radius: 7px; font-weight: 800; font-size: 18px;
         letter-spacing: 0.04em; color: #111; background: var(--accent); white-space: nowrap; opacity: 0;
         box-shadow: 0 4px 10px rgba(0,0,0,0.25);
       }
       .tag.orange { background: #fb923c; }
 
+      .side {
+        position: absolute; left: 868px; width: 190px; padding: 10px 14px; border-radius: 14px;
+        background: var(--accent); color: #111; font-weight: 900; font-size: 28px; line-height: 1.05;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.45); opacity: 0;
+      }
+      .side::before {
+        content: ""; position: absolute; left: -14px; top: 50%; margin-top: -12px;
+        border-style: solid; border-width: 12px 14px 12px 0; border-color: transparent var(--accent) transparent transparent;
+      }
+      .side.orange { background: #fb923c; }
+      .side.orange::before { border-right-color: #fb923c; }
       /* screen-space overlays (not zoomed) */
       #eq {
-        position: absolute; left: 30px; top: 450px; width: 536px; padding: 22px 18px 26px; border-radius: 28px;
+        position: absolute; left: 30px; top: 850px; width: 536px; padding: 22px 18px 26px; border-radius: 28px;
         background: rgba(9,14,32,0.94); border: 2px solid rgba(250,204,21,0.6);
         box-shadow: 0 30px 60px rgba(0,0,0,0.45); opacity: 0; text-align: center;
       }
@@ -113,9 +124,9 @@
       #eq .res small { color: var(--accent); }
 
       /* ---------- captions ---------- */
-      #captions { position: absolute; left: 190px; top: 1100px; width: 700px; height: 150px; }
+      #captions { position: absolute; left: 90px; top: 1716px; width: 900px; height: 150px; }
       .cap {
-        position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: max-content; max-width: 690px; text-align: center; opacity: 0;
+        position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: max-content; max-width: 900px; text-align: center; opacity: 0;
         padding: 10px 22px 14px; border-radius: 26px; background: rgba(7,11,24,0.86); border: 2px solid rgba(255,255,255,0.12);
         font-weight: 800; font-size: 50px; line-height: 1.14; letter-spacing: -0.01em;
         text-shadow: 0 6px 18px rgba(0,0,0,0.6);
@@ -197,17 +208,12 @@
               <div class="ripple" id="rp-quote" style="left:115px; top:782px"></div>
               <div class="box" id="bx-quote" style="left:80px; top:758px; width:72px; height:48px"></div>
               <div class="box" id="bx-kldv" style="left:153px; top:99px; width:76px; height:36px"></div>
-              <div class="tag" id="tg-kldv" style="left:160px; top:140px">DI SINI</div>
               <div class="box" id="bx-fcpo" style="left:211px; top:304px; width:70px; height:40px"></div>
               <div class="ripple" id="rp-fcpo" style="left:246px; top:324px"></div>
               <div class="box" id="bx-jan" style="left:3px; top:203px; width:378px; height:50px"></div>
-              <div class="tag" id="tg-jan" style="left:150px; top:210px">CONTRACT BIASA</div>
               <div class="box" id="bx-feb" style="left:3px; top:256px; width:378px; height:50px"></div>
-              <div class="tag" id="tg-feb" style="left:150px; top:263px">CONTRACT BIASA</div>
               <div class="box" id="bx-out" style="left:6px; top:100px; width:180px; height:48px"></div>
-              <div class="tag" id="tg-out" style="left:8px; top:154px">OUTRIGHT · 1 BULAN</div>
               <div class="box red" id="bx-spr" style="left:3px; top:470px; width:378px; height:48px"></div>
-              <div class="tag orange" id="tg-spr" style="left:70px; top:414px">SPREAD ⇄ 2 BULAN</div>
               <div class="ripple" id="rp-spr" style="left:120px; top:464px"></div>
               <div class="box red" id="bx-sprice" style="left:6px; top:100px; width:162px; height:48px"></div>
               <div class="box green" id="bx-buy" style="left:116px; top:755px; width:132px; height:42px"></div>
@@ -228,6 +234,14 @@
           </div>
         </div>
       </div>
+
+
+      <!-- side labels next to the phone, pointing at the row they explain -->
+      <div class="side" id="tg-kldv" style="top:545px">DI SINI</div>
+      <div class="side" id="tg-jan" style="top:712px">CONTRACT BIASA</div>
+      <div class="side" id="tg-feb" style="top:795px">CONTRACT BIASA</div>
+      <div class="side" id="tg-out" style="top:548px">OUTRIGHT 1 BULAN</div>
+      <div class="side orange" id="tg-spr" style="top:1125px">SPREAD 2 BULAN</div>
 
       <!-- captions (built from the transcript below) -->
       <div id="captions"></div>
@@ -253,23 +267,18 @@
       <audio id="s-pop1" src="assets/sfx/pop.wav" data-start="2.84" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
       <audio id="s-sw1" src="assets/sfx/swipe.wav" data-start="3.72" data-duration="0.28" data-volume="0.45" data-track-index="4"></audio>
       <audio id="s-clk1" src="assets/sfx/click.wav" data-start="4.5" data-duration="0.06" data-volume="0.6" data-track-index="3"></audio>
-      <audio id="s-wh1" src="assets/sfx/whoosh.wav" data-start="5.75" data-duration="0.55" data-volume="0.45" data-track-index="4"></audio>
       <audio id="s-pop2" src="assets/sfx/pop.wav" data-start="6.5" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
       <audio id="s-wh2" src="assets/sfx/whoosh.wav" data-start="7.45" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
-      <audio id="s-wh3" src="assets/sfx/whoosh.wav" data-start="8.15" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
       <audio id="s-pop3" src="assets/sfx/pop.wav" data-start="9.68" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
       <audio id="s-clk2" src="assets/sfx/click.wav" data-start="10.16" data-duration="0.06" data-volume="0.65" data-track-index="3"></audio>
       <audio id="s-wh4" src="assets/sfx/whoosh.wav" data-start="10.9" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
       <audio id="s-sw2" src="assets/sfx/swipe.wav" data-start="13.72" data-duration="0.28" data-volume="0.45" data-track-index="4"></audio>
       <audio id="s-sw3" src="assets/sfx/swipe.wav" data-start="16.08" data-duration="0.28" data-volume="0.45" data-track-index="4"></audio>
-      <audio id="s-wh5" src="assets/sfx/whoosh.wav" data-start="18.1" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
       <audio id="s-pop4" src="assets/sfx/pop.wav" data-start="18.95" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
       <audio id="s-riser" src="assets/sfx/riser.wav" data-start="20.5" data-duration="1.4" data-volume="0.45" data-track-index="4"></audio>
       <audio id="s-ding1" src="assets/sfx/ding.wav" data-start="21.95" data-duration="1.6" data-volume="0.45" data-track-index="3"></audio>
       <audio id="s-clk3" src="assets/sfx/click.wav" data-start="22.67" data-duration="0.06" data-volume="0.65" data-track-index="5"></audio>
-      <audio id="s-wh6" src="assets/sfx/whoosh.wav" data-start="23.75" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
       <audio id="s-ching" src="assets/sfx/ching.wav" data-start="24.35" data-duration="0.9" data-volume="0.45" data-track-index="5"></audio>
-      <audio id="s-wh7" src="assets/sfx/whoosh.wav" data-start="26.7" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
       <audio id="s-clk4" src="assets/sfx/click.wav" data-start="27.98" data-duration="0.06" data-volume="0.65" data-track-index="3"></audio>
       <audio id="s-clk5" src="assets/sfx/click.wav" data-start="28.5" data-duration="0.06" data-volume="0.65" data-track-index="5"></audio>
       <audio id="s-wh8" src="assets/sfx/whoosh.wav" data-start="28.75" data-duration="0.55" data-volume="0.55" data-track-index="4"></audio>
@@ -349,24 +358,6 @@
         tl.to("#cam", { scale: s, x, y, duration: dur, ease }, t);
       }
       tl.set("#cam", { scale: 1, x: 0, y: 0 }, 0);
-      cam(0.6, 1.12, 192, 300, 3.0, "sine.inOut");     // slow push on market summary
-      cam(3.75, 1.0, 192, 416, 0.01);                   // hard reset on cut
-      cam(5.85, 1.8, 191, 160, 0.45);                   // KL-DV tab
-      cam(7.5, 1.0, 192, 416, 0.3);                     // back out on filter screen
-      cam(8.2, 1.8, 192, 330, 0.5);                     // transaction type chips
-      cam(10.95, 1.0, 192, 416, 0.35);                  // out to list
-      cam(12.68, 1.0, 192, 416, 0.01);
-      cam(12.9, 1.45, 192, 250, 0.8);                   // push to JAN27 / FEB27 rows
-      cam(17.42, 1.0, 192, 416, 0.01);
-      cam(18.15, 1.75, 100, 160, 0.5);                  // JAN27 price
-      cam(20.04, 1.0, 192, 416, 0.01);
-      cam(20.3, 1.45, 192, 480, 0.8);                   // spread row
-      cam(21.72, 1.45, 192, 455, 0.3);                  // follow the scroll
-      cam(23.02, 1.0, 192, 416, 0.3);                   // detail page opens
-      cam(23.85, 1.8, 120, 150, 0.45);                  // spread price
-      cam(24.98, 1.0, 192, 416, 0.4);
-      cam(26.75, 1.9, 247, 700, 0.45);                  // Buy / Sell buttons
-      cam(28.75, 1.0, 192, 416, 0.5);
 
       // ---------- callouts ----------
       function boxIn(sel, t, out) {
@@ -374,7 +365,7 @@
         if (out != null) tl.to(sel, { opacity: 0, duration: 0.15 }, out);
       }
       function tagIn(sel, t, out) {
-        tl.fromTo(sel, { opacity: 0, y: 8, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2.5)" }, t);
+        tl.fromTo(sel, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.25, ease: "back.out(2.2)" }, t);
         if (out != null) tl.to(sel, { opacity: 0, duration: 0.15 }, out);
       }
       function ripple(sel, t) {
@@ -395,6 +386,7 @@
       boxIn("#bx-spr", 20.78, 23.0);
       tl.fromTo("#bx-spr", { y: 0 }, { y: -30, duration: 0.25, ease: "power2.out" }, 21.74);
       tl.to("#bx-spr", { y: -28, duration: 0.2 }, 21.99);
+      tl.set("#tg-spr", { y: -44 }, 21.9);
       tagIn("#tg-spr", 21.98, 23.0);
       tl.fromTo("#bx-spr", { boxShadow: "0 0 18px rgba(251,146,60,0.95)" }, { boxShadow: "0 0 34px rgba(251,146,60,1)", duration: 0.3, yoyo: true, repeat: 3 }, 21.98);
       ripple("#rp-spr", 22.67);
