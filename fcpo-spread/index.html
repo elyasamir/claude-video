@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700;800;900&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --ground: #070b18;
+        --ground-2: #0f1a36;
+        --ink: #ffffff;
+        --muted: #9fb0d4;
+        --accent: #facc15;
+        --buy: #22c55e;
+        --sell: #ef4444;
+        --blue: #3b82f6;
+        --font-display: "Poppins", "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px; height: 1920px; overflow: hidden;
+        background: var(--ground);
+      }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        font-family: var(--font-display); color: var(--ink);
+        background:
+          radial-gradient(900px 700px at 50% 38%, #1b2d5c 0%, rgba(27,45,92,0) 70%),
+          linear-gradient(180deg, var(--ground-2) 0%, var(--ground) 100%);
+      }
+      /* faint chart grid in the background */
+      #bg-grid {
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+      #bg-line { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+
+      /* ---------- header ---------- */
+      #header { position: absolute; left: 0; top: 140px; width: 1080px; text-align: center; }
+      #kicker {
+        display: inline-block; padding: 8px 22px; border-radius: 999px;
+        background: rgba(250,204,21,0.14); border: 2px solid rgba(250,204,21,0.55);
+        color: var(--accent); font-weight: 700; font-size: 26px; letter-spacing: 0.18em;
+      }
+      #title { margin-top: 12px; font-size: 62px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+      #title .hl { color: var(--accent); }
+      #step {
+        position: absolute; left: 50%; top: 296px; height: 58px; transform: translateX(-50%);
+        display: flex; align-items: center; gap: 14px; padding: 0 26px 0 8px; border-radius: 999px;
+        background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.16);
+        white-space: nowrap;
+      }
+      #step-num {
+        width: 44px; height: 44px; border-radius: 50%; background: var(--blue);
+        display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 28px;
+      }
+      #step-text { font-weight: 700; font-size: 28px; position: relative; height: 40px; line-height: 40px; min-width: 260px; text-align: left; }
+      #step-text span { position: absolute; left: 0; top: 0; white-space: nowrap; opacity: 0; }
+
+      /* ---------- phone ---------- */
+      #phone {
+        position: absolute; left: 234px; top: 384px; width: 612px; height: 1306px;
+        border-radius: 48px; background: #05070d; padding: 8px;
+        box-shadow: 0 40px 90px rgba(0,0,0,0.6), 0 0 0 2px rgba(255,255,255,0.12), 0 0 80px rgba(59,130,246,0.25);
+      }
+      #screen {
+        position: relative; width: 596px; height: 1290px; border-radius: 42px; overflow: hidden; background: #fff;
+      }
+      /* stage holds the recording at its native 384x832 size, scaled to fill the screen */
+      #stage { position: absolute; left: 0; top: 0; width: 384px; height: 832px; transform-origin: 0 0; transform: scale(1.55208, 1.55048); }
+      #cam { position: absolute; left: 0; top: 0; width: 384px; height: 832px; transform-origin: 0 0; }
+      #cam video { position: absolute; left: 0; top: 0; width: 384px; height: 832px; object-fit: fill; }
+
+      /* callouts live in source-pixel space inside #cam, so they follow the zoom */
+      .box {
+        position: absolute; border-radius: 9px; border: 3px solid var(--accent);
+        box-shadow: 0 0 0 2000px rgba(5,10,25,0), 0 0 16px rgba(250,204,21,0.9);
+        opacity: 0;
+      }
+      .box.red { border-color: #fb923c; box-shadow: 0 0 18px rgba(251,146,60,0.95); }
+      .box.green { border: 4px solid #fff; box-shadow: 0 0 0 3px var(--buy), 0 0 22px rgba(34,197,94,1); }
+      .box.sell { border: 4px solid #fff; box-shadow: 0 0 0 3px var(--sell), 0 0 22px rgba(239,68,68,1); }
+      .dim { position: absolute; background: rgba(5,10,25,0.0); opacity: 0; }
+      .ripple {
+        position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+        border: 3px solid rgba(59,130,246,0.95); background: rgba(59,130,246,0.25); opacity: 0;
+      }
+      .tag {
+        position: absolute; padding: 3px 9px; border-radius: 7px; font-weight: 800; font-size: 15px;
+        letter-spacing: 0.04em; color: #111; background: var(--accent); white-space: nowrap; opacity: 0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      }
+      .tag.orange { background: #fb923c; }
+
+      /* screen-space overlays (not zoomed) */
+      #eq {
+        position: absolute; left: 30px; top: 450px; width: 536px; padding: 22px 18px 26px; border-radius: 28px;
+        background: rgba(9,14,32,0.94); border: 2px solid rgba(250,204,21,0.6);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.45); opacity: 0; text-align: center;
+      }
+      #eq .lbl { font-size: 28px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; }
+      #eq .row { display: flex; align-items: flex-end; justify-content: center; gap: 14px; margin-top: 18px; }
+      #eq .leg { display: flex; flex-direction: column; align-items: center; }
+      #eq .leg small { font-size: 28px; font-weight: 700; color: var(--muted); }
+      #eq .leg b { font-size: 38px; font-weight: 800; }
+      #eq .op { font-size: 38px; font-weight: 800; color: var(--muted); padding-bottom: 2px; }
+      #eq .res b { color: var(--sell); }
+      #eq .res small { color: var(--accent); }
+
+      /* ---------- captions ---------- */
+      #captions { position: absolute; left: 190px; top: 1100px; width: 700px; height: 150px; }
+      .cap {
+        position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: max-content; max-width: 690px; text-align: center; opacity: 0;
+        padding: 10px 22px 14px; border-radius: 26px; background: rgba(7,11,24,0.86); border: 2px solid rgba(255,255,255,0.12);
+        font-weight: 800; font-size: 50px; line-height: 1.14; letter-spacing: -0.01em;
+        text-shadow: 0 6px 18px rgba(0,0,0,0.6);
+      }
+      .cap .w { display: inline-block; margin: 0 7px; opacity: 0.6; }
+      .cap .w.k { color: var(--accent); }
+      .cap .w.buy { color: var(--buy); }
+      .cap .w.sell { color: var(--sell); }
+
+      /* ---------- outro ---------- */
+      #outro { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: 0; }
+      #tip {
+        position: absolute; left: 110px; top: 400px; width: 860px; padding: 44px 46px; border-radius: 44px;
+        background: linear-gradient(160deg, #13224a, #0a1124); border: 2px solid rgba(255,255,255,0.14);
+        box-shadow: 0 40px 90px rgba(0,0,0,0.5);
+      }
+      #tip .t1 { font-size: 30px; font-weight: 800; color: var(--accent); letter-spacing: 0.16em; }
+      #tip .t2 { margin-top: 18px; font-size: 54px; font-weight: 900; line-height: 1.12; }
+      #tip .legs { display: flex; gap: 22px; margin-top: 36px; }
+      #tip .legbox { flex: 1; border-radius: 26px; padding: 26px; text-align: center; font-weight: 800; }
+      #tip .legbox small { display: block; font-size: 26px; opacity: 0.85; }
+      #tip .legbox b { display: block; font-size: 48px; margin-top: 6px; }
+      #tip .lb { background: rgba(34,197,94,0.16); border: 2px solid var(--buy); color: #86efac; }
+      #tip .ls { background: rgba(239,68,68,0.16); border: 2px solid var(--sell); color: #fca5a5; }
+      #tip .t3 { margin-top: 30px; font-size: 30px; font-weight: 600; color: var(--muted); line-height: 1.35; }
+      #cta {
+        position: absolute; left: 50%; top: 1130px; transform: translateX(-50%);
+        padding: 24px 46px; border-radius: 999px; background: var(--accent); color: #111;
+        font-size: 40px; font-weight: 900; white-space: nowrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="33" data-width="1080" data-height="1920">
+      <div id="bg-grid"></div>
+      <svg id="bg-line" viewBox="0 0 1080 1920" data-layout-ignore>
+        <path id="bg-path" d="M-20 1560 L120 1500 L220 1530 L330 1420 L440 1460 L560 1330 L680 1380 L790 1250 L900 1290 L1100 1140"
+              fill="none" stroke="rgba(34,197,94,0.22)" stroke-width="6" stroke-linejoin="round" />
+      </svg>
+
+      <!-- header -->
+      <div id="header" data-layout-allow-safe-zone>
+        <div id="kicker">TUTORIAL</div>
+        <div id="title">Cara Trade <span class="hl">SPREAD</span> FCPO</div>
+      </div>
+      <div id="step">
+        <div id="step-num">1</div>
+        <div id="step-text">
+          <span id="st1">Buka Quote</span>
+          <span id="st2">Pilih KL-DV</span>
+          <span id="st3">Filter FCPO</span>
+          <span id="st4">Cari row Spread</span>
+          <span id="st5">Tekan Buy / Sell</span>
+        </div>
+      </div>
+
+      <!-- phone with the edited screen recording -->
+      <div id="phone">
+        <div id="screen">
+          <div id="stage">
+            <div id="cam">
+              <!-- jump-cut edit: each clip plays one kept range of the raw recording (see assets/cuts.json) -->
+              <video id="v0"  class="clip" src="assets/raw.mp4" data-start="0"     data-duration="3.75" data-media-start="0.68"  data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v1"  class="clip" src="assets/raw.mp4" data-start="3.75"  data-duration="1.38" data-media-start="5.11"  data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v2"  class="clip" src="assets/raw.mp4" data-start="5.13"  data-duration="2.43" data-media-start="7.02"  data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v3"  class="clip" src="assets/raw.mp4" data-start="7.56"  data-duration="3.58" data-media-start="10.20" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v4"  class="clip" src="assets/raw.mp4" data-start="11.14" data-duration="1.54" data-media-start="14.98" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v5"  class="clip" src="assets/raw.mp4" data-start="12.68" data-duration="4.74" data-media-start="16.97" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v6"  class="clip" src="assets/raw.mp4" data-start="17.42" data-duration="2.62" data-media-start="22.38" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v7"  class="clip" src="assets/raw.mp4" data-start="20.04" data-duration="3.74" data-media-start="27.62" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v8"  class="clip" src="assets/raw.mp4" data-start="23.78" data-duration="1.20" data-media-start="31.85" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v9"  class="clip" src="assets/raw.mp4" data-start="24.98" data-duration="0.85" data-media-start="33.72" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v10" class="clip" src="assets/raw.mp4" data-start="25.83" data-duration="0.98" data-media-start="35.00" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" data-track-index="1" playsinline></video>
+              <video id="v11" class="clip" src="assets/raw.mp4" data-start="26.81" data-duration="1.94" data-media-start="37.74" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.06" data-track-index="1" playsinline></video>
+              <!-- hold the last frame under the outro -->
+              <video id="v12" class="clip" src="assets/raw.mp4" data-start="28.75" data-duration="0.7" data-media-start="39.68" muted data-track-index="1" playsinline></video>
+
+              <!-- callouts, in source pixels (384x832) -->
+              <div class="ripple" id="rp-quote" style="left:115px; top:782px"></div>
+              <div class="box" id="bx-quote" style="left:80px; top:758px; width:72px; height:48px"></div>
+              <div class="box" id="bx-kldv" style="left:153px; top:99px; width:76px; height:36px"></div>
+              <div class="tag" id="tg-kldv" style="left:160px; top:140px">DI SINI</div>
+              <div class="box" id="bx-fcpo" style="left:211px; top:304px; width:70px; height:40px"></div>
+              <div class="ripple" id="rp-fcpo" style="left:246px; top:324px"></div>
+              <div class="box" id="bx-jan" style="left:3px; top:203px; width:378px; height:50px"></div>
+              <div class="tag" id="tg-jan" style="left:150px; top:210px">CONTRACT BIASA</div>
+              <div class="box" id="bx-feb" style="left:3px; top:256px; width:378px; height:50px"></div>
+              <div class="tag" id="tg-feb" style="left:150px; top:263px">CONTRACT BIASA</div>
+              <div class="box" id="bx-out" style="left:6px; top:100px; width:180px; height:48px"></div>
+              <div class="tag" id="tg-out" style="left:8px; top:154px">OUTRIGHT · 1 BULAN</div>
+              <div class="box red" id="bx-spr" style="left:3px; top:470px; width:378px; height:48px"></div>
+              <div class="tag orange" id="tg-spr" style="left:70px; top:414px">SPREAD ⇄ 2 BULAN</div>
+              <div class="ripple" id="rp-spr" style="left:120px; top:464px"></div>
+              <div class="box red" id="bx-sprice" style="left:6px; top:100px; width:162px; height:48px"></div>
+              <div class="box green" id="bx-buy" style="left:116px; top:755px; width:132px; height:42px"></div>
+              <div class="box sell" id="bx-sell" style="left:248px; top:755px; width:132px; height:42px"></div>
+            </div>
+          </div>
+
+          <!-- spread maths card -->
+          <div id="eq">
+            <div class="lbl">HARGA SPREAD</div>
+            <div class="row">
+              <div class="leg"><small>JAN27</small><b>4,470</b></div>
+              <div class="op">−</div>
+              <div class="leg"><small>FEB27</small><b>4,582</b></div>
+              <div class="op">≈</div>
+              <div class="leg res"><small>SPREAD</small><b>−113</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- captions (built from the transcript below) -->
+      <div id="captions"></div>
+
+      <!-- outro -->
+      <div id="outro" data-layout-allow-safe-zone>
+        <div id="tip">
+          <div class="t1">TIP</div>
+          <div class="t2">Satu order spread = dua contract sekali gus</div>
+          <div class="legs">
+            <div class="legbox lb"><small>BUY SPREAD</small><b>Buy JAN27</b><small>+ Sell FEB27</small></div>
+            <div class="legbox ls"><small>SELL SPREAD</small><b>Sell JAN27</b><small>+ Buy FEB27</small></div>
+          </div>
+          <div class="t3">Harga spread = bulan dekat tolak bulan jauh.</div>
+        </div>
+        <div id="cta">Save &amp; share video ni 🔖</div>
+      </div>
+
+      <!-- sound design -->
+      <audio id="music" class="clip" src="assets/sfx/music.m4a" data-start="0" data-duration="33" data-volume="0.16" data-fade-in="0.6" data-fade-out="1.5" data-track-index="2"></audio>
+      <audio id="s-impact" src="assets/sfx/impact.wav" data-start="0.05" data-duration="1.2" data-volume="0.7" data-track-index="3"></audio>
+      <audio id="s-wh0" src="assets/sfx/whoosh.wav" data-start="0.0" data-duration="0.55" data-volume="0.55" data-track-index="4"></audio>
+      <audio id="s-pop1" src="assets/sfx/pop.wav" data-start="2.84" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
+      <audio id="s-sw1" src="assets/sfx/swipe.wav" data-start="3.72" data-duration="0.28" data-volume="0.45" data-track-index="4"></audio>
+      <audio id="s-clk1" src="assets/sfx/click.wav" data-start="4.5" data-duration="0.06" data-volume="0.6" data-track-index="3"></audio>
+      <audio id="s-wh1" src="assets/sfx/whoosh.wav" data-start="5.75" data-duration="0.55" data-volume="0.45" data-track-index="4"></audio>
+      <audio id="s-pop2" src="assets/sfx/pop.wav" data-start="6.5" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
+      <audio id="s-wh2" src="assets/sfx/whoosh.wav" data-start="7.45" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
+      <audio id="s-wh3" src="assets/sfx/whoosh.wav" data-start="8.15" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
+      <audio id="s-pop3" src="assets/sfx/pop.wav" data-start="9.68" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
+      <audio id="s-clk2" src="assets/sfx/click.wav" data-start="10.16" data-duration="0.06" data-volume="0.65" data-track-index="3"></audio>
+      <audio id="s-wh4" src="assets/sfx/whoosh.wav" data-start="10.9" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
+      <audio id="s-sw2" src="assets/sfx/swipe.wav" data-start="13.72" data-duration="0.28" data-volume="0.45" data-track-index="4"></audio>
+      <audio id="s-sw3" src="assets/sfx/swipe.wav" data-start="16.08" data-duration="0.28" data-volume="0.45" data-track-index="4"></audio>
+      <audio id="s-wh5" src="assets/sfx/whoosh.wav" data-start="18.1" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
+      <audio id="s-pop4" src="assets/sfx/pop.wav" data-start="18.95" data-duration="0.16" data-volume="0.5" data-track-index="3"></audio>
+      <audio id="s-riser" src="assets/sfx/riser.wav" data-start="20.5" data-duration="1.4" data-volume="0.45" data-track-index="4"></audio>
+      <audio id="s-ding1" src="assets/sfx/ding.wav" data-start="21.95" data-duration="1.6" data-volume="0.45" data-track-index="3"></audio>
+      <audio id="s-clk3" src="assets/sfx/click.wav" data-start="22.67" data-duration="0.06" data-volume="0.65" data-track-index="5"></audio>
+      <audio id="s-wh6" src="assets/sfx/whoosh.wav" data-start="23.75" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
+      <audio id="s-ching" src="assets/sfx/ching.wav" data-start="24.35" data-duration="0.9" data-volume="0.45" data-track-index="5"></audio>
+      <audio id="s-wh7" src="assets/sfx/whoosh.wav" data-start="26.7" data-duration="0.55" data-volume="0.4" data-track-index="4"></audio>
+      <audio id="s-clk4" src="assets/sfx/click.wav" data-start="27.98" data-duration="0.06" data-volume="0.65" data-track-index="3"></audio>
+      <audio id="s-clk5" src="assets/sfx/click.wav" data-start="28.5" data-duration="0.06" data-volume="0.65" data-track-index="5"></audio>
+      <audio id="s-wh8" src="assets/sfx/whoosh.wav" data-start="28.75" data-duration="0.55" data-volume="0.55" data-track-index="4"></audio>
+      <audio id="s-ding2" src="assets/sfx/ding.wav" data-start="29.25" data-duration="1.6" data-volume="0.45" data-track-index="3"></audio>
+    </div>
+
+    <script>
+      // ---------- captions: [words with out-timeline start times], end ----------
+      // k = keyword (yellow), b = buy (green), s = sell (red)
+      const CAPS = [
+        [[["Jadi",0.05],["kalau",0.5],["kita",0.62],["nak",0.88],["trade",1.16],["SPREAD",1.38,"k"]], 2.6],
+        [[["Buka",2.84],["apps",3.14]], 3.95],
+        [[["Pergi",4.0],["dekat",4.1],["QUOTE",4.44,"k"],["ni",4.72]], 5.28],
+        [[["Make",5.3],["sure",5.74],["kita",5.9],["dekat",6.26],["KL-DV",6.52,"k"]], 7.6],
+        [[["Kemudian",7.62],["kita",8.14],["boleh",8.48],["tukar",8.86],["kepada",9.3]], 9.66],
+        [[["FCPO",9.68,"k"],["macam",10.28],["biasa",10.54]], 11.06],
+        [[["Kalau",11.1],["tengok",11.48],["dekat",11.74],["sini",11.96]], 12.78],
+        [[["Ada",12.82],["FCPO",13.76,"k"],["JAN27",14.66,"k"]], 15.95],
+        [[["FCPO",16.05,"k"],["FEB27",16.64,"k"]], 17.4],
+        [[["So",17.42],["JAN27",17.96,"k"],["ni",18.7],["yang",19.08],["biasa",19.28],["lah",19.62]], 20.03],
+        [[["Tapi",20.06],["kalau",20.34],["SPREAD,",20.78,"k"],["dekat",21.06],["bawah",21.32],["ni",21.66]], 21.97],
+        [[["JAN27",21.98,"k"],["FEB27",22.88,"k"]], 23.76],
+        [[["So",23.78],["ini",24.24],["SPREAD",24.5,"k"]], 24.98],
+        [[["Kalau",25.02],["kita",25.26],["nak",25.56],["BUY",25.98,"b"],["&",26.32],["SELL",26.62,"s"]], 26.96],
+        [[["Dekat",27.0],["bawah",27.06],["ni",27.4],["ada",27.5],["butang",27.66],["BUY",27.98,"b"],["&",28.28],["SELL",28.5,"s"]], 28.98],
+      ];
+      const KCLS = { k: "k", b: "buy", s: "sell" };
+      const capRoot = document.getElementById("captions");
+      CAPS.forEach((c, i) => {
+        const d = document.createElement("div");
+        d.className = "cap"; d.id = "cap" + i;
+        c[0].forEach(([w, t, k], j) => {
+          const s = document.createElement("span");
+          s.className = "w" + (k ? " " + KCLS[k] : ""); s.id = `cap${i}w${j}`; s.textContent = w;
+          d.appendChild(s);
+        });
+        capRoot.appendChild(d);
+      });
+
+      const tl = gsap.timeline({ paused: true });
+      const $ = (s) => document.querySelector(s);
+
+      // ---------- captions animation ----------
+      CAPS.forEach((c, i) => {
+        const el = "#cap" + i, start = c[0][0][1], end = c[1];
+        tl.fromTo(el, { opacity: 0, y: 26, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.16, ease: "back.out(2)" }, start);
+        c[0].forEach(([w, t], j) => {
+          tl.fromTo(`#cap${i}w${j}`, { opacity: 0.6, scale: 1 }, { opacity: 1, scale: 1.12, duration: 0.08, ease: "power2.out" }, t);
+          tl.to(`#cap${i}w${j}`, { scale: 1, duration: 0.18, ease: "power2.out" }, t + 0.08);
+        });
+        tl.to(el, { opacity: 0, duration: 0.06 }, end - 0.06);
+      });
+
+      // ---------- intro ----------
+      tl.fromTo("#bg-path", { strokeDasharray: 1600, strokeDashoffset: 1600 }, { strokeDashoffset: 0, duration: 3, ease: "power2.out" }, 0);
+      tl.fromTo("#kicker", { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+      tl.fromTo("#title", { opacity: 0, scale: 1.6, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.out" }, 0.05);
+      tl.fromTo("#phone", { y: 900, rotation: 4, opacity: 0 }, { y: 0, rotation: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 0);
+      tl.fromTo("#step", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2.5)" }, 2.84);
+
+      // ---------- step indicator ----------
+      const STEPS = [[2.84, 1], [5.13, 2], [7.56, 3], [20.04, 4], [24.98, 5]];
+      STEPS.forEach(([t, n], i) => {
+        if (i > 0) tl.to(`#st${STEPS[i - 1][1]}`, { opacity: 0, y: -24, duration: 0.18, ease: "power2.in" }, t - 0.05);
+        tl.fromTo(`#st${n}`, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, t + 0.1);
+        tl.set("#step-num", { textContent: n }, t + 0.1);
+        tl.fromTo("#step-num", { scale: 1.5 }, { scale: 1, duration: 0.3, ease: "back.out(3)" }, t + 0.1);
+      });
+      tl.set("#step-num", { textContent: 1 }, 0);
+
+      // ---------- camera (zoom inside the phone) ----------
+      const W = 384, H = 832;
+      function cam(t, s, cx, cy, dur = 0.45, ease = "power3.inOut") {
+        let x = W / 2 - cx * s, y = H / 2 - cy * s;
+        x = Math.min(0, Math.max(W - W * s, x));
+        y = Math.min(0, Math.max(H - H * s, y));
+        tl.to("#cam", { scale: s, x, y, duration: dur, ease }, t);
+      }
+      tl.set("#cam", { scale: 1, x: 0, y: 0 }, 0);
+      cam(0.6, 1.12, 192, 300, 3.0, "sine.inOut");     // slow push on market summary
+      cam(3.75, 1.0, 192, 416, 0.01);                   // hard reset on cut
+      cam(5.85, 1.8, 191, 160, 0.45);                   // KL-DV tab
+      cam(7.5, 1.0, 192, 416, 0.3);                     // back out on filter screen
+      cam(8.2, 1.8, 192, 330, 0.5);                     // transaction type chips
+      cam(10.95, 1.0, 192, 416, 0.35);                  // out to list
+      cam(12.68, 1.0, 192, 416, 0.01);
+      cam(12.9, 1.45, 192, 250, 0.8);                   // push to JAN27 / FEB27 rows
+      cam(17.42, 1.0, 192, 416, 0.01);
+      cam(18.15, 1.75, 100, 160, 0.5);                  // JAN27 price
+      cam(20.04, 1.0, 192, 416, 0.01);
+      cam(20.3, 1.45, 192, 480, 0.8);                   // spread row
+      cam(21.72, 1.45, 192, 455, 0.3);                  // follow the scroll
+      cam(23.02, 1.0, 192, 416, 0.3);                   // detail page opens
+      cam(23.85, 1.8, 120, 150, 0.45);                  // spread price
+      cam(24.98, 1.0, 192, 416, 0.4);
+      cam(26.75, 1.9, 247, 700, 0.45);                  // Buy / Sell buttons
+      cam(28.75, 1.0, 192, 416, 0.5);
+
+      // ---------- callouts ----------
+      function boxIn(sel, t, out) {
+        tl.fromTo(sel, { opacity: 0, scale: 1.35 }, { opacity: 1, scale: 1, duration: 0.22, ease: "back.out(2)" }, t);
+        if (out != null) tl.to(sel, { opacity: 0, duration: 0.15 }, out);
+      }
+      function tagIn(sel, t, out) {
+        tl.fromTo(sel, { opacity: 0, y: 8, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.22, ease: "back.out(2.5)" }, t);
+        if (out != null) tl.to(sel, { opacity: 0, duration: 0.15 }, out);
+      }
+      function ripple(sel, t) {
+        tl.fromTo(sel, { opacity: 0.95, scale: 0.4 }, { opacity: 0, scale: 2.4, duration: 0.5, ease: "power2.out", immediateRender: false }, t);
+      }
+      // Quote nav
+      boxIn("#bx-quote", 4.3, 5.1); ripple("#rp-quote", 4.5);
+      // KL-DV
+      boxIn("#bx-kldv", 6.3, 7.45); tagIn("#tg-kldv", 6.35, 7.45);
+      // FCPO chip + tap
+      boxIn("#bx-fcpo", 9.62, 10.9); ripple("#rp-fcpo", 10.16);
+      // JAN27 / FEB27 rows
+      boxIn("#bx-jan", 13.7, 15.95); tagIn("#tg-jan", 14.66, 15.95);
+      boxIn("#bx-feb", 16.05, 17.38); tagIn("#tg-feb", 16.64, 17.38);
+      // JAN27 price = outright
+      boxIn("#bx-out", 18.6, 20.0); tagIn("#tg-out", 18.95, 20.0);
+      // spread row, follows the list flick at src 29.35s (= out 21.77s)
+      boxIn("#bx-spr", 20.78, 23.0);
+      tl.fromTo("#bx-spr", { y: 0 }, { y: -30, duration: 0.25, ease: "power2.out" }, 21.74);
+      tl.to("#bx-spr", { y: -28, duration: 0.2 }, 21.99);
+      tagIn("#tg-spr", 21.98, 23.0);
+      tl.fromTo("#bx-spr", { boxShadow: "0 0 18px rgba(251,146,60,0.95)" }, { boxShadow: "0 0 34px rgba(251,146,60,1)", duration: 0.3, yoyo: true, repeat: 3 }, 21.98);
+      ripple("#rp-spr", 22.67);
+      // spread price + maths card
+      boxIn("#bx-sprice", 24.2, 24.98);
+      tl.fromTo("#eq", { opacity: 0, y: 80, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.8)" }, 24.35);
+      tl.to("#eq", { opacity: 0, y: 40, duration: 0.25, ease: "power2.in" }, 26.55);
+      // Buy / Sell
+      boxIn("#bx-buy", 27.95, 28.75); boxIn("#bx-sell", 28.47, 28.75);
+      tl.to("#bx-buy", { scale: 1.08, duration: 0.15, yoyo: true, repeat: 1 }, 28.2);
+
+      // ---------- outro ----------
+      tl.to("#phone", { scale: 0.86, opacity: 0, filter: "blur(6px)", duration: 0.5, ease: "power2.inOut" }, 28.75);
+      tl.to("#step", { opacity: 0, duration: 0.25 }, 28.75);
+      tl.set("#outro", { opacity: 1 }, 28.85);
+      tl.fromTo("#tip", { opacity: 0, y: 120, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 28.85);
+      tl.fromTo("#tip .legbox", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.18, ease: "power3.out" }, 29.3);
+      tl.fromTo("#cta", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.5)" }, 30.1);
+      tl.to("#cta", { scale: 1.06, duration: 0.35, yoyo: true, repeat: 3, ease: "sine.inOut" }, 30.5);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
