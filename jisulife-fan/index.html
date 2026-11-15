@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Inter:wght@400;500;600;700&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --cream: #f4efe8;
+        --paper: #fbf8f3;
+        --ink: #2b2622;
+        --soft: #8a8079;
+        --line: #ddd4c9;
+        --accent: #c98b6b;   /* terracotta */
+        --sage: #9aae8c;
+        --serif: "Fraunces", Georgia, serif;
+        --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--cream); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--cream); font-family: var(--sans); color: var(--ink); }
+
+      /* top margin */
+      #topbar { position: absolute; left: 60px; top: 40px; width: 960px; height: 50px; display: flex; justify-content: space-between; align-items: center; }
+      #topbar .l { font-size: 28px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--soft); font-weight: 500; }
+      #topbar .r { font-family: var(--serif); font-style: italic; font-size: 34px; color: var(--ink); }
+
+      /* the footage, inset with rounded corners */
+      #frame {
+        position: absolute; left: 60px; top: 106px; width: 960px; height: 1707px; border-radius: 36px; overflow: hidden;
+        background: #ccc; box-shadow: 0 20px 50px rgba(60,40,20,0.12); transform-origin: 50% 0%;
+      }
+      #frame video { position: absolute; left: 0; top: 0; width: 960px; height: 1707px; object-fit: cover; }
+      #shade { position: absolute; left: 0; right: 0; bottom: 0; height: 520px; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(20,14,10,0.6) 100%); }
+
+      /* intro title */
+      #intro { position: absolute; left: 130px; top: 200px; width: 700px; padding: 40px 0 46px; border-radius: 40px; text-align: center; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.45); background: rgba(30,22,16,0.38); }
+      #intro .kick { font-size: 28px; letter-spacing: 0.3em; text-transform: uppercase; font-weight: 600; opacity: 0; }
+      #intro .name { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 150px; line-height: 1.05; opacity: 0; }
+      #intro .sub { font-size: 34px; font-weight: 500; opacity: 0; }
+
+      /* feature toast */
+      .toast {
+        position: absolute; left: 100px; top: 170px; display: flex; align-items: center; gap: 14px;
+        padding: 14px 26px 14px 16px; border-radius: 999px; background: rgba(251,248,243,0.92);
+        box-shadow: 0 10px 30px rgba(40,25,10,0.15); opacity: 0; white-space: nowrap;
+      }
+      .toast i { width: 40px; height: 40px; border-radius: 50%; background: var(--sage); position: relative; flex: none; }
+      .toast i::after { content: ""; position: absolute; left: 14px; top: 9px; width: 9px; height: 17px; border: solid #fff; border-width: 0 4px 4px 0; transform: rotate(45deg); }
+      .toast span { font-size: 32px; font-weight: 600; color: var(--ink); }
+
+      /* battery widget */
+      #batt {
+        position: absolute; right: 100px; top: 170px; padding: 20px 24px; border-radius: 26px; background: rgba(251,248,243,0.92);
+        box-shadow: 0 10px 30px rgba(40,25,10,0.15); opacity: 0; text-align: center; width: 230px;
+      }
+      #batt .ic { position: relative; width: 120px; height: 56px; margin: 0 auto; border: 4px solid var(--ink); border-radius: 12px; padding: 5px; }
+      #batt .ic::after { content: ""; position: absolute; right: -14px; top: 15px; width: 8px; height: 18px; border-radius: 0 5px 5px 0; background: var(--ink); }
+      #batt .fill { height: 100%; width: 100%; border-radius: 6px; background: var(--sage); transform-origin: 0 50%; }
+      #batt .pct { margin-top: 10px; font-family: var(--serif); font-size: 56px; font-weight: 600; line-height: 1; }
+      #batt .lbl { margin-top: 6px; font-size: 28px; color: var(--soft); font-weight: 500; }
+
+      /* speed meter */
+      #speed {
+        position: absolute; right: 100px; top: 170px; padding: 22px 26px; border-radius: 26px; background: rgba(251,248,243,0.92);
+        box-shadow: 0 10px 30px rgba(40,25,10,0.15); opacity: 0; width: 250px;
+      }
+      #speed .lbl { font-size: 28px; color: var(--soft); font-weight: 500; letter-spacing: 0.04em; }
+      #speed .bars { display: flex; align-items: flex-end; gap: 10px; height: 110px; margin-top: 14px; }
+      #speed .bars div { flex: 1; border-radius: 8px; background: var(--line); }
+      #speed .bars div.on { background: var(--accent); }
+      #speed .lv { margin-top: 14px; font-family: var(--serif); font-size: 46px; font-weight: 600; line-height: 1; }
+      #speed .lv em { font-style: italic; font-weight: 400; color: #9c5b3e; }
+
+      /* captions */
+      #captions { position: absolute; left: 100px; top: 1560px; width: 880px; height: 160px; }
+      .cap {
+        position: absolute; left: 0; top: 0; width: 880px; text-align: center; opacity: 0; color: #fff;
+        font-size: 50px; font-weight: 600; line-height: 1.2; letter-spacing: -0.01em; text-shadow: 0 3px 18px rgba(0,0,0,0.55);
+      }
+      .cap .w { display: inline-block; margin: 0 6px; opacity: 0.55; }
+      .cap .w.k { font-family: var(--serif); font-style: italic; font-weight: 600; font-size: 56px; color: #fff; }
+
+      /* end card */
+      #end { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; opacity: 0; }
+      #end .name { position: absolute; left: 0; top: 900px; width: 1080px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 120px; line-height: 1; }
+      #end .sub { position: absolute; left: 0; top: 1040px; width: 1080px; text-align: center; font-size: 30px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--soft); font-weight: 500; }
+      #end .feats { position: absolute; left: 190px; top: 1120px; width: 700px; }
+      #end .feats div { display: flex; align-items: center; gap: 18px; padding: 16px 4px; border-bottom: 1.5px solid var(--line); font-size: 32px; font-weight: 500; opacity: 0; }
+      #end .feats div:last-child { border-bottom: 0; }
+      #end .feats b { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); flex: none; }
+      #end .cta { position: absolute; left: 50%; top: 1555px; transform: translateX(-50%); padding: 22px 54px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 34px; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; opacity: 0; }
+      #end .bye { position: absolute; left: 0; top: 1680px; width: 1080px; text-align: center; font-family: var(--serif); font-style: italic; font-size: 40px; color: var(--soft); opacity: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="28.8" data-width="1080" data-height="1920">
+      <div id="topbar" data-layout-allow-safe-zone><div class="l">review · kipas tangan</div><div class="r">JisuLife</div></div>
+
+      <div id="frame">
+        <!-- jump-cut edit: kept ranges of the raw clip (assets/cuts.json) -->
+        <video id="v0" class="clip" src="assets/raw.mp4" data-start="0"     data-duration="3.45" data-media-start="8.40"  data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" playsinline></video>
+        <video id="v1" class="clip" src="assets/raw.mp4" data-start="3.45"  data-duration="1.15" data-media-start="14.85" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" playsinline></video>
+        <video id="v2" class="clip" src="assets/raw.mp4" data-start="4.6"   data-duration="1.53" data-media-start="16.72" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" playsinline></video>
+        <video id="v3" class="clip" src="assets/raw.mp4" data-start="6.13"  data-duration="1.4"  data-media-start="19.15" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" playsinline></video>
+        <video id="v4" class="clip" src="assets/raw.mp4" data-start="7.53"  data-duration="3.05" data-media-start="21.50" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.04" playsinline></video>
+        <video id="v5" class="clip" src="assets/raw.mp4" data-start="10.58" data-duration="5.0"  data-media-start="25.55" data-has-audio="true" data-fade-in="0.03" data-fade-out="0.05" playsinline></video>
+        <video id="v6" class="clip" src="assets/raw.mp4" data-start="15.58" data-duration="2.05" data-media-start="31.25" data-has-audio="true" data-fade-in="0.05" data-fade-out="0.05" playsinline></video>
+        <video id="v7" class="clip" src="assets/raw.mp4" data-start="17.63" data-duration="3.45" data-media-start="34.20" data-has-audio="true" data-fade-in="0.05" data-fade-out="0.05" playsinline></video>
+        <video id="v8" class="clip" src="assets/raw.mp4" data-start="21.08" data-duration="5.5"  data-media-start="38.25" data-has-audio="true" data-fade-in="0.05" data-fade-out="0.4" playsinline></video>
+        <video id="v9" class="clip" src="assets/raw.mp4" data-start="26.58" data-duration="2.22" data-media-start="43.75" muted playsinline></video>
+        <div id="shade"></div>
+
+        <div id="intro">
+          <div class="kick">review</div>
+          <div class="name">JisuLife</div>
+          <div class="sub">kipas tangan mudah alih</div>
+        </div>
+
+        <div class="toast" id="t1"><i></i><span>Boleh dicas</span></div>
+        <div class="toast" id="t2"><i></i><span>Bateri tahan lama</span></div>
+        <div class="toast" id="t3"><i></i><span>5 level kelajuan</span></div>
+        <div class="toast" id="t4"><i></i><span>Mudah dibawa berjalan</span></div>
+        <div class="toast" id="t5"><i></i><span>Boleh gantung di leher</span></div>
+
+        <div id="batt"><div class="ic"><div class="fill"></div></div><div class="pct"><span id="pctn">0</span>%</div><div class="lbl">cas penuh</div></div>
+
+        <div id="speed">
+          <div class="lbl">kelajuan</div>
+          <div class="bars"><div id="b1" style="height:30%"></div><div id="b2" style="height:45%"></div><div id="b3" style="height:62%"></div><div id="b4" style="height:80%"></div><div id="b5" style="height:100%"></div></div>
+          <div class="lv">level <em id="lvn">1</em></div>
+        </div>
+
+        <div id="captions"></div>
+      </div>
+
+      <div id="end" data-layout-allow-safe-zone>
+        <div class="name">JisuLife</div>
+        <div class="sub">kipas tangan mudah alih</div>
+        <div class="feats">
+          <div><b></b>Boleh dicas, bateri tahan lama</div>
+          <div><b></b>5 level kelajuan</div>
+          <div><b></b>Ringan &amp; mudah dibawa</div>
+          <div><b></b>Ada tali untuk gantung di leher</div>
+        </div>
+        <div class="cta">Dapatkan sekarang →</div>
+        <div class="bye">sampai jumpa lagi 👋</div>
+      </div>
+
+      <!-- sound: soft bed + gentle accents -->
+      <audio id="music" class="clip" src="assets/sfx/music.m4a" data-start="0" data-duration="28.8" data-volume="0.14" data-fade-in="0.8" data-fade-out="2"></audio>
+      <audio id="s0" src="assets/sfx/whoosh.wav" data-start="0" data-duration="0.55" data-volume="0.25"></audio>
+      <audio id="s1" src="assets/sfx/pop.wav" data-start="0.35" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s2" src="assets/sfx/pop.wav" data-start="5.42" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s3" src="assets/sfx/swipe.wav" data-start="6.2" data-duration="0.28" data-volume="0.2"></audio>
+      <audio id="s4" src="assets/sfx/ding.wav" data-start="8.0" data-duration="1.6" data-volume="0.18"></audio>
+      <audio id="s5" src="assets/sfx/pop.wav" data-start="9.75" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s6" src="assets/sfx/click.wav" data-start="11.43" data-duration="0.06" data-volume="0.3"></audio>
+      <audio id="s7" src="assets/sfx/click.wav" data-start="12.93" data-duration="0.06" data-volume="0.3"></audio>
+      <audio id="s8" src="assets/sfx/click.wav" data-start="14.43" data-duration="0.06" data-volume="0.3"></audio>
+      <audio id="s9" src="assets/sfx/click.wav" data-start="15.73" data-duration="0.06" data-volume="0.3"></audio>
+      <audio id="s10" src="assets/sfx/pop.wav" data-start="16.0" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s11" src="assets/sfx/pop.wav" data-start="18.41" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s12" src="assets/sfx/pop.wav" data-start="21.95" data-duration="0.16" data-volume="0.22"></audio>
+      <audio id="s13" src="assets/sfx/whoosh.wav" data-start="23.95" data-duration="0.55" data-volume="0.25"></audio>
+      <audio id="s14" src="assets/sfx/ding.wav" data-start="24.7" data-duration="1.6" data-volume="0.16"></audio>
+    </div>
+
+    <script>
+      // captions: [[word, start, keyword?]...], end
+      const CAPS = [
+        [[["Kalau", 0.1], ["nak", 0.6], ["beli", 0.82], ["kipas", 1.38, 1], ["tangan", 1.76, 1]], 2.15],
+        [[["korang", 2.2], ["boleh", 2.4], ["beli", 2.5], ["ni,", 2.66], ["JisuLife", 2.84, 1]], 3.47],
+        [[["Tengok", 3.54], ["ni,", 4.1]], 4.6],
+        [[["dia", 4.64], ["boleh", 4.86], ["cas", 5.42, 1]], 6.1],
+        [[["Cas", 6.16], ["sampai", 6.36], ["100%", 6.72, 1]], 8.28],
+        [[["boleh,", 8.33], ["tapi", 9.39], ["tahan", 9.75, 1], ["lama", 10.09, 1]], 10.56],
+        [[["Tengok,", 10.61], ["level", 11.29, 1], ["kekuatan", 12.39], ["kipas", 13.17], ["dia", 13.65]], 14.1],
+        [[["Sampai", 14.15], ["sini", 14.45], ["terasa", 14.73, 1]], 15.58],
+        [[["Sampai", 15.67], ["lebih", 16.35], ["laju", 16.81, 1]], 17.6],
+        [[["Kalau", 17.73], ["korang", 17.95], ["nak", 18.21], ["berjalan-jalan,", 18.41, 1]], 19.1],
+        [[["boleh", 19.13], ["guna", 19.27], ["ni", 19.55]], 20.25],
+        [[["Memang", 20.29], ["best!", 20.59, 1]], 21.1],
+        [[["Boleh", 21.17], ["gantung", 21.41], ["kat", 21.71], ["leher", 21.95, 1], ["juga", 22.15]], 22.78],
+        [[["Tengok,", 22.81], ["ada", 23.19], ["tali", 23.31, 1]], 23.95],
+      ];
+      const capRoot = document.getElementById("captions");
+      CAPS.forEach((c, i) => {
+        const d = document.createElement("div"); d.className = "cap"; d.id = "cap" + i;
+        c[0].forEach(([w, t, k], j) => {
+          const s = document.createElement("span"); s.className = "w" + (k ? " k" : ""); s.id = `cap${i}w${j}`; s.textContent = w;
+          d.appendChild(s);
+        });
+        capRoot.appendChild(d);
+      });
+
+      const tl = gsap.timeline({ paused: true });
+      CAPS.forEach((c, i) => {
+        const el = "#cap" + i, start = c[0][0][1], end = c[1];
+        tl.fromTo(el, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, start);
+        c[0].forEach(([w, t], j) => tl.fromTo(`#cap${i}w${j}`, { opacity: 0.55 }, { opacity: 1, duration: 0.12, ease: "power1.out" }, t));
+        tl.to(el, { opacity: 0, duration: 0.08 }, end - 0.08);
+      });
+
+      // intro
+      tl.fromTo("#frame", { opacity: 0, scale: 0.96 }, { opacity: 1, scale: 1, duration: 0.6, ease: "power2.out" }, 0);
+      tl.fromTo("#topbar", { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+      tl.fromTo("#intro .kick", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.25);
+      tl.fromTo("#intro .name", { opacity: 0, y: 24, scale: 1.04 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 0.35);
+      tl.fromTo("#intro .sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.6);
+      tl.to("#intro", { opacity: 0, y: -20, duration: 0.45, ease: "power2.in" }, 3.0);
+
+      // feature toasts, one at a time
+      function toast(sel, t, out) {
+        tl.fromTo(sel, { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, t);
+        tl.to(sel, { opacity: 0, y: -10, duration: 0.3, ease: "power2.in" }, out);
+      }
+      toast("#t1", 5.42, 7.9);
+      toast("#t2", 9.75, 12.3);
+      toast("#t3", 16.0, 17.55);
+      toast("#t4", 18.41, 21.0);
+      toast("#t5", 21.95, 23.9);
+
+      // battery: fills to 100%
+      const bat = { v: 0 };
+      tl.set(bat, { v: 0 }, 0);
+      tl.fromTo("#batt", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 6.2);
+      tl.fromTo("#batt .fill", { scaleX: 0 }, { scaleX: 1, duration: 1.7, ease: "power2.inOut" }, 6.35);
+      tl.fromTo(bat, { v: 0 }, { v: 100, duration: 1.7, ease: "power2.inOut",
+        onUpdate: () => { document.getElementById("pctn").textContent = Math.round(bat.v); } }, 6.35);
+      tl.fromTo("#batt .pct", { scale: 1.15 }, { scale: 1, duration: 0.4, ease: "back.out(3)", immediateRender: false }, 8.05);
+      tl.to("#batt", { opacity: 0, y: -10, duration: 0.3, ease: "power2.in" }, 10.4);
+
+      // speed meter, synced to the level on the fan's display (01 -> 05)
+      tl.fromTo("#speed", { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 10.75);
+      const LV = [[10.75, 1], [11.43, 2], [12.93, 3], [14.43, 4], [15.73, 5]];
+      for (let b = 1; b <= 5; b++) tl.set("#b" + b, { className: "" }, 0);
+      LV.forEach(([t, n]) => {
+        tl.set("#b" + n, { className: "on" }, t);
+        tl.fromTo("#b" + n, { scaleY: 0.4 }, { scaleY: 1, duration: 0.3, ease: "back.out(2.5)", transformOrigin: "50% 100%", immediateRender: false }, t);
+        tl.set("#lvn", { textContent: n }, t);
+      });
+      tl.to("#speed", { opacity: 0, y: -10, duration: 0.3, ease: "power2.in" }, 17.55);
+
+      // end card: footage tucks up into a small rounded window, card below
+      tl.to("#captions", { opacity: 0, duration: 0.2 }, 23.95);
+      tl.to("#frame", { scale: 0.42, y: 60, borderRadius: 60, duration: 0.8, ease: "power3.inOut" }, 24.0);
+      tl.to("#shade", { opacity: 0, duration: 0.5 }, 24.0);
+      tl.to("#topbar", { opacity: 0, duration: 0.4 }, 24.0);
+      tl.set("#end", { opacity: 1 }, 24.3);
+      tl.fromTo("#end .name", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 24.4);
+      tl.fromTo("#end .sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 24.6);
+      tl.fromTo("#end .feats div", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.15, ease: "power2.out" }, 24.9);
+      tl.fromTo("#end .cta", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 25.7);
+      tl.fromTo("#end .bye", { opacity: 0 }, { opacity: 1, duration: 0.6 }, 26.0);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
