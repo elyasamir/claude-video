@@ -4,89 +4,122 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1080, height=1920" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@500;600;800&display=block" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&display=block" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
     <style>
       :root {
-        --paper: #fbfaf6; --ink: #1d1d1b; --soft: #77736b; --faint: #c9c5bc;
-        --tp: #16a34a; --sl: #dc2626;
-        --hand: "Caveat", cursive; --sans: "Inter", "Helvetica Neue", Arial, sans-serif;
+        --ground: #070b18; --ground-2: #0f1a36; --ink: #ffffff; --muted: #9fb0d4;
+        --accent: #facc15; --tp: #22c55e; --sl: #ef4444; --blue: #3b82f6;
+        --font: "Poppins", "Helvetica Neue", Arial, sans-serif;
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); }
-      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: var(--paper); font-family: var(--sans); color: var(--ink); }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--ground); }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--font); color: var(--ink);
+        background:
+          radial-gradient(900px 700px at 50% 42%, #1b2d5c 0%, rgba(27,45,92,0) 70%),
+          linear-gradient(180deg, var(--ground-2) 0%, var(--ground) 100%);
+      }
+      #bg-grid { position: absolute; inset: 0;
+        background-image: linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+        background-size: 60px 60px; }
 
-      #title { position: absolute; left: 60px; top: 160px; width: 960px; font-size: 64px; font-weight: 800; letter-spacing: -0.02em; }
-      .panel { position: absolute; left: 60px; width: 960px; height: 560px; border: 3px solid var(--ink); border-radius: 10px; background: #fff; overflow: hidden; }
-      #p1 { top: 280px; } #p2 { top: 900px; }
+      #header { position: absolute; left: 0; top: 120px; width: 1080px; text-align: center; }
+      #kicker { display: inline-block; padding: 8px 22px; border-radius: 999px; background: rgba(250,204,21,0.14);
+        border: 2px solid rgba(250,204,21,0.55); color: var(--accent); font-weight: 700; font-size: 28px; letter-spacing: 0.18em; }
+      #title { margin-top: 14px; font-size: 68px; font-weight: 900; letter-spacing: -0.02em; line-height: 1; }
+      #title .hl { color: var(--accent); }
+
+      .panel { position: absolute; left: 60px; width: 960px; height: 560px; border-radius: 30px; overflow: hidden;
+        background: rgba(10,17,38,0.88); border: 2px solid rgba(255,255,255,0.14);
+        box-shadow: 0 30px 70px rgba(0,0,0,0.45); }
+      #p1 { top: 330px; } #p2 { top: 940px; }
       .panel svg { position: absolute; left: 0; top: 0; width: 960px; height: 560px; }
-      .plabel { position: absolute; left: 22px; top: 10px; font-family: var(--hand); font-size: 50px; font-weight: 700; }
-      .hand { font-family: var(--hand); font-weight: 700; }
+      .plabel { position: absolute; left: 24px; top: 20px; padding: 6px 20px; border-radius: 999px; font-size: 30px; font-weight: 800; letter-spacing: 0.08em; }
+      #p1 .plabel { background: rgba(34,197,94,0.16); border: 2px solid var(--tp); color: #86efac; }
+      #p2 .plabel { background: rgba(239,68,68,0.16); border: 2px solid var(--sl); color: #fca5a5; }
+      svg text { font-family: var(--font); font-weight: 800; }
 
-      #end1 { position: absolute; left: 0; top: 1530px; width: 1080px; text-align: center; font-size: 60px; font-weight: 800; letter-spacing: -0.02em; opacity: 0; }
-      #end2 { position: absolute; left: 0; top: 1620px; width: 1080px; text-align: center; font-family: var(--hand); font-size: 50px; font-weight: 700; color: var(--soft); opacity: 0; }
-      #brand { position: absolute; left: 0; top: 1720px; width: 1080px; text-align: center; font-size: 34px; font-weight: 600; color: var(--soft); letter-spacing: 0.02em; opacity: 0; }
-      #brand b { color: var(--tp); font-weight: 800; }
+      #end1 { position: absolute; left: 0; top: 1545px; width: 1080px; text-align: center; font-size: 72px; font-weight: 900; letter-spacing: -0.02em; opacity: 0; }
+      #end1 .hl { color: var(--accent); }
+      #end2 { position: absolute; left: 0; top: 1640px; width: 1080px; text-align: center; font-size: 36px; font-weight: 600; color: var(--muted); opacity: 0; }
+      #brand { position: absolute; left: 50%; top: 1720px; transform: translateX(-50%); padding: 14px 36px; border-radius: 999px;
+        background: #fff; color: #0b1020; font-size: 38px; font-weight: 900; white-space: nowrap; opacity: 0;
+        box-shadow: 0 16px 40px rgba(250,204,21,0.3), 0 0 0 4px rgba(250,204,21,0.5); }
+      #brand span { color: #16a34a; }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="16.5" data-width="1080" data-height="1920">
-      <div id="title">Nak pandai trade FCPO:</div>
+      <div id="bg-grid"></div>
+
+      <div id="header" data-layout-allow-safe-zone>
+        <div id="kicker">MINDSET TRADER</div>
+        <div id="title">Nak pandai trade <span class="hl">FCPO</span>:</div>
+      </div>
 
       <!-- EXPECTATION -->
       <div class="panel" id="p1">
         <svg viewBox="0 0 960 560">
-          <line x1="40" y1="120" x2="930" y2="120" stroke="#16a34a" stroke-width="3" stroke-dasharray="12 10" />
-          <text x="925" y="106" text-anchor="end" class="hand" font-size="40" fill="#16a34a">TP</text>
-          <line x1="40" y1="455" x2="930" y2="455" stroke="#dc2626" stroke-width="3" stroke-dasharray="12 10" />
-          <text x="925" y="500" text-anchor="end" class="hand" font-size="40" fill="#dc2626">SL</text>
-          <path id="exp-path" d="M120 380 C 300 380, 420 290, 520 240 S 720 140, 820 120" fill="none" stroke="#1d1d1b" stroke-width="5" stroke-linecap="round" />
-          <circle cx="120" cy="380" r="11" fill="#1d1d1b" />
-          <text x="120" y="425" text-anchor="middle" class="hand" font-size="38" fill="#1d1d1b">1 trade</text>
+          <line x1="40" y1="130" x2="930" y2="130" stroke="#22c55e" stroke-width="3" stroke-dasharray="14 10" />
+          <text x="925" y="114" text-anchor="end" font-size="32" fill="#22c55e">TP</text>
+          <line x1="40" y1="460" x2="930" y2="460" stroke="#ef4444" stroke-width="3" stroke-dasharray="14 10" />
+          <text x="925" y="505" text-anchor="end" font-size="32" fill="#ef4444">SL</text>
+          <path id="exp-path" d="M120 385 C 300 385, 420 300, 520 250 S 720 150, 820 130" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+          <circle cx="120" cy="385" r="12" fill="#facc15" />
+          <text x="120" y="432" text-anchor="middle" font-size="30" fill="#ffffff">1 trade</text>
           <g id="exp-hit" opacity="0">
-            <circle cx="820" cy="120" r="16" fill="#16a34a" />
-            <text x="820" y="185" text-anchor="middle" class="hand" font-size="46" fill="#16a34a">✓ profit!</text>
+            <circle cx="820" cy="130" r="18" fill="#22c55e" />
+            <text x="925" y="195" text-anchor="end" font-size="40" fill="#22c55e">✓ PROFIT!</text>
           </g>
         </svg>
-        <div class="plabel">Jangkaan</div>
+        <div class="plabel">JANGKAAN</div>
       </div>
 
       <!-- REALITY -->
       <div class="panel" id="p2">
-        <svg viewBox="0 0 960 560" id="rsvg">
+        <svg viewBox="0 0 960 560">
           <g id="pile"></g>
-          <line x1="40" y1="120" x2="930" y2="120" stroke="#16a34a" stroke-width="3" stroke-dasharray="12 10" />
-          <text x="925" y="106" text-anchor="end" class="hand" font-size="40" fill="#16a34a">TP</text>
-          <line x1="40" y1="455" x2="930" y2="455" stroke="#dc2626" stroke-width="3" stroke-dasharray="12 10" />
-          <text x="925" y="500" text-anchor="end" class="hand" font-size="40" fill="#dc2626">SL</text>
+          <line x1="40" y1="130" x2="930" y2="130" stroke="#22c55e" stroke-width="3" stroke-dasharray="14 10" />
+          <text x="925" y="114" text-anchor="end" font-size="32" fill="#22c55e">TP</text>
+          <line x1="40" y1="460" x2="930" y2="460" stroke="#ef4444" stroke-width="3" stroke-dasharray="14 10" />
+          <text x="925" y="505" text-anchor="end" font-size="32" fill="#ef4444">SL</text>
           <g id="arcs"></g>
-          <path id="win-path" d="M120 380 C 300 330, 500 160, 820 120" fill="none" stroke="#16a34a" stroke-width="6" stroke-linecap="round" />
-          <circle cx="120" cy="380" r="11" fill="#1d1d1b" />
-          <text id="counter" x="110" y="428" text-anchor="start" class="hand" font-size="44" fill="#dc2626">1 kali kena SL</text>
+          <path id="win-path" d="M120 385 C 300 335, 500 170, 820 130" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round" />
+          <circle cx="120" cy="385" r="12" fill="#facc15" />
+          <text id="counter" x="104" y="436" text-anchor="start" font-size="34" fill="#f87171">1 kali kena SL</text>
           <g id="win-hit" opacity="0">
-            <circle cx="820" cy="120" r="16" fill="#16a34a" />
-            <text x="925" y="185" text-anchor="end" class="hand" font-size="46" fill="#16a34a">✓ akhirnya TP!</text>
+            <circle cx="820" cy="130" r="18" fill="#22c55e" />
+            <text x="925" y="222" text-anchor="end" font-size="40" fill="#22c55e">✓ AKHIRNYA TP!</text>
           </g>
         </svg>
-        <div class="plabel">Realiti</div>
+        <div class="plabel">REALITI</div>
       </div>
 
-      <div id="end1">Teruskan trade.</div>
-      <div id="end2">setiap SL tu pelajaran</div>
-      <div id="brand"><b>tradersawit</b>.com</div>
+      <div id="end1">Teruskan <span class="hl">trade.</span></div>
+      <div id="end2">Setiap SL tu pelajaran.</div>
+      <div id="brand">trader<span>sawit</span>.com</div>
 
-      <audio id="music" class="clip" src="assets/sfx/music.m4a" data-start="0" data-duration="16.5" data-volume="0.3" data-fade-in="0.5" data-fade-out="1.5"></audio>
-      <audio id="s-ding1" src="assets/sfx/ding.wav" data-start="1.85" data-duration="1.6" data-volume="0.3"></audio>
-      <audio id="s-ding2" src="assets/sfx/ding.wav" data-start="13.15" data-duration="1.6" data-volume="0.4"></audio>
-      <audio id="s-wh" src="assets/sfx/whoosh.wav" data-start="13.7" data-duration="0.55" data-volume="0.2"></audio>
+      <!-- sound effects only (no music) -->
+      <audio id="s-impact" src="assets/sfx/impact.wav" data-start="0.05" data-duration="1.2" data-volume="0.5"></audio>
+      <audio id="s-wh0" src="assets/sfx/whoosh.wav" data-start="0.0" data-duration="0.55" data-volume="0.4"></audio>
+      <audio id="s-sw1" src="assets/sfx/swipe.wav" data-start="0.6" data-duration="0.28" data-volume="0.35"></audio>
+      <audio id="s-ding1" src="assets/sfx/ding.wav" data-start="1.85" data-duration="1.6" data-volume="0.4"></audio>
+      <audio id="s-c1" src="assets/sfx/click.wav" data-start="1.45" data-duration="0.06" data-volume="0.45"></audio>
+      <audio id="s-c2" src="assets/sfx/click.wav" data-start="2.44" data-duration="0.06" data-volume="0.45"></audio>
+      <audio id="s-c3" src="assets/sfx/click.wav" data-start="2.84" data-duration="0.06" data-volume="0.45"></audio>
+      <audio id="s-c4" src="assets/sfx/click.wav" data-start="3.15" data-duration="0.06" data-volume="0.45"></audio>
+      <audio id="s-riser" src="assets/sfx/riser.wav" data-start="11.15" data-duration="1.4" data-volume="0.4"></audio>
+      <audio id="s-ding2" src="assets/sfx/ding.wav" data-start="13.15" data-duration="1.6" data-volume="0.5"></audio>
+      <audio id="s-wh1" src="assets/sfx/whoosh.wav" data-start="13.7" data-duration="0.55" data-volume="0.4"></audio>
+      <audio id="s-pop" src="assets/sfx/pop.wav" data-start="14.8" data-duration="0.16" data-volume="0.45"></audio>
     </div>
 
     <script>
       const NS = "http://www.w3.org/2000/svg";
       const N = 136;                       // loss trades drawn (the counter climbs to 1,000)
       const ROWS = 16;
-      // deterministic pseudo-random
-      let seed = 20271;
+      let seed = 20271;                    // deterministic pseudo-random
       const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
 
       // pile slots: a triangle of red "loss slips", filled bottom-up from the middle out
@@ -94,7 +127,7 @@
       for (let r = 0; r < ROWS; r++) {
         const n = ROWS - r, w = 20, x0 = 480 - (n * w) / 2;
         const row = [];
-        for (let i = 0; i < n; i++) row.push([x0 + i * w + 1, 545 - r * 11 - 10]);
+        for (let i = 0; i < n; i++) row.push([x0 + i * w + 1, 548 - r * 11 - 10]);
         row.sort((a, b) => Math.abs(a[0] + 9 - 480) - Math.abs(b[0] + 9 - 480));
         slots.push(...row);
       }
@@ -103,32 +136,32 @@
       for (let k = 0; k < N; k++) {
         const p = k / (N - 1);
         const ex = 260 + rnd() * 520;
-        // later attempts get closer to TP: practice is working
-        const cy = Math.max(70, 330 - 230 * Math.pow(p, 0.8) + (rnd() - 0.5) * 70);
+        const cy = Math.max(80, 335 - 230 * Math.pow(p, 0.8) + (rnd() - 0.5) * 70);   // attempts creep toward TP
         const cx = 160 + rnd() * (ex - 160);
         const path = document.createElementNS(NS, "path");
-        path.setAttribute("d", `M120 380 Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} 455`);
-        path.setAttribute("fill", "none"); path.setAttribute("stroke", "#1d1d1b");
+        path.setAttribute("d", `M120 385 Q ${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} 460`);
+        path.setAttribute("fill", "none"); path.setAttribute("stroke", "#ffffff");
         path.setAttribute("stroke-width", "2.5"); path.setAttribute("stroke-linecap", "round");
         path.setAttribute("id", "arc" + k);
         arcs.appendChild(path);
         const chip = document.createElementNS(NS, "rect");
         chip.setAttribute("x", "0"); chip.setAttribute("y", "0"); chip.setAttribute("width", "18"); chip.setAttribute("height", "10");
-        chip.setAttribute("rx", "2.5"); chip.setAttribute("fill", "#dc2626"); chip.setAttribute("id", "chip" + k);
+        chip.setAttribute("rx", "2.5"); chip.setAttribute("fill", "#ef4444"); chip.setAttribute("id", "chip" + k);
         pile.appendChild(chip);
         A.push({ path, chip, ex, len: path.getTotalLength(), slot: slots[k] });
       }
 
       const tl = gsap.timeline({ paused: true });
 
-      // title + panels
-      tl.fromTo("#title", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0);
-      tl.fromTo(".panel", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.12, ease: "power2.out" }, 0.05);
+      // header + panels
+      tl.fromTo("#kicker", { opacity: 0, y: -30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+      tl.fromTo("#title", { opacity: 0, scale: 1.5, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.32, ease: "power4.out" }, 0.05);
+      tl.fromTo(".panel", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: "back.out(1.6)" }, 0.15);
 
       // expectation: one clean trade to TP
       const ep = document.getElementById("exp-path"), eLen = ep.getTotalLength();
       tl.fromTo(ep, { strokeDasharray: eLen, strokeDashoffset: eLen }, { strokeDashoffset: 0, duration: 1.2, ease: "power1.inOut" }, 0.6);
-      tl.fromTo("#exp-hit", { opacity: 0, scale: 0.4, transformOrigin: "820px 120px" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)" }, 1.8);
+      tl.fromTo("#exp-hit", { opacity: 0, scale: 0.4, transformOrigin: "820px 130px" }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(3)" }, 1.8);
 
       // reality: attempts accelerate, every one stops out and drops a slip on the pile
       const START = 0.9, SPAN = 11.6;
@@ -137,10 +170,10 @@
       A.forEach((a, k) => {
         const t = START + SPAN * Math.pow(k / (N - 1), 0.5);
         const d = Math.max(0.16, 0.55 - 0.4 * (k / 40));
-        tl.fromTo(a.path, { strokeDasharray: a.len, strokeDashoffset: a.len, opacity: 1 },
+        tl.fromTo(a.path, { strokeDasharray: a.len, strokeDashoffset: a.len, opacity: 0.95 },
           { strokeDashoffset: 0, duration: d, ease: "power1.in" }, t);
-        tl.to(a.path, { opacity: 0.13, strokeWidth: 1.5, duration: 0.5 }, t + d);
-        tl.fromTo(a.chip, { x: a.ex - 9, y: 450, opacity: 0 },
+        tl.to(a.path, { opacity: 0.12, strokeWidth: 1.5, duration: 0.5 }, t + d);
+        tl.fromTo(a.chip, { x: a.ex - 9, y: 455, opacity: 0 },
           { x: a.slot[0], y: a.slot[1], opacity: 1, duration: 0.28, ease: "power2.in" }, t + d);
         const val = Math.max(k + 1, Math.round(1000 * Math.pow((k + 1) / N, 2.2)));
         tl.set("#counter", { textContent: `${fmt(val)} kali kena SL` }, t + d);
@@ -151,12 +184,14 @@
       const wp = document.getElementById("win-path"), wLen = wp.getTotalLength();
       tl.set(wp, { strokeDasharray: wLen, strokeDashoffset: wLen }, 0);
       tl.to(wp, { strokeDashoffset: 0, duration: 0.65, ease: "power1.inOut" }, 12.5);
-      tl.fromTo("#win-hit", { opacity: 0, scale: 0.4, transformOrigin: "820px 120px" }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(3)" }, 13.15);
+      tl.fromTo("#win-hit", { opacity: 0, scale: 0.4, transformOrigin: "820px 130px" }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(3)" }, 13.15);
+      tl.to("#p2", { boxShadow: "0 30px 70px rgba(0,0,0,0.45), 0 0 60px rgba(34,197,94,0.45)", duration: 0.4 }, 13.15);
 
       // ending
-      tl.fromTo("#end1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 13.8);
-      tl.fromTo("#end2", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 14.3);
-      tl.fromTo("#brand", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 14.8);
+      tl.fromTo("#end1", { opacity: 0, scale: 1.4, filter: "blur(8px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.35, ease: "power4.out" }, 13.8);
+      tl.fromTo("#end2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 14.3);
+      tl.fromTo("#brand", { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(2.5)" }, 14.8);
+      tl.to("#brand", { scale: 1.06, duration: 0.35, yoyo: true, repeat: 1, ease: "sine.inOut" }, 15.3);
 
       window.__timelines = window.__timelines || {};
       window.__timelines["main"] = tl;
