@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@500;600;700;800&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #060b1a; --bg2: #0c1733; --ink: #ffffff; --muted: #9fb0d4; --line: rgba(255,255,255,0.14);
+        --red: #e11d48; --up: #22c55e; --down: #ef4444; --na: #64748b; --gold: #facc15;
+        --head: "Oswald", Arial, sans-serif; --body: "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--body); color: var(--ink);
+        background: radial-gradient(1100px 800px at 80% 10%, #1a2c63 0%, rgba(26,44,99,0) 60%), linear-gradient(180deg, var(--bg2), var(--bg)); }
+      #dots { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.09) 1.6px, transparent 1.8px); background-size: 34px 34px; }
+      #streak { position: absolute; left: -400px; top: 0; width: 300px; height: 1920px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.06), rgba(255,255,255,0)); transform: skewX(-18deg); }
+
+      /* intro */
+      #intro { position: absolute; inset: 0; }
+      .bar { position: absolute; left: -200px; width: 1500px; height: 180px; transform: skewY(-8deg); }
+      #bar1 { top: 700px; background: var(--red); }
+      #bar2 { top: 880px; background: #1d4ed8; }
+      #i-title { position: absolute; left: 0; top: 690px; width: 1080px; text-align: center; font-family: var(--head); font-weight: 700; font-size: 128px; line-height: 0.98; letter-spacing: 0.01em; text-transform: uppercase; text-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+      #i-date { position: absolute; left: 0; top: 980px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #dbe4ff; }
+
+      /* persistent header */
+      #header { position: absolute; left: 60px; top: 110px; width: 960px; opacity: 0; }
+      #h-tag { display: inline-flex; align-items: center; gap: 12px; padding: 6px 16px; background: var(--red); font-family: var(--head); font-weight: 600; font-size: 30px; letter-spacing: 0.08em; }
+      #h-tag i { width: 14px; height: 14px; border-radius: 50%; background: #fff; display: block; }
+      #h-title { margin-top: 10px; font-family: var(--head); font-weight: 700; font-size: 74px; line-height: 1; letter-spacing: 0.01em; }
+      #h-date { margin-top: 8px; font-size: 30px; font-weight: 600; color: var(--muted); }
+      #h-rule { position: absolute; left: 60px; top: 330px; width: 960px; height: 3px; background: linear-gradient(90deg, var(--red), rgba(225,29,72,0)); transform-origin: 0 50%; opacity: 0; }
+
+      #section { position: absolute; left: 60px; top: 352px; height: 52px; display: flex; align-items: center; opacity: 0; }
+      #section b { width: 10px; height: 52px; background: var(--gold); display: block; }
+      #section-text { position: relative; height: 52px; width: 700px; margin-left: 16px; }
+      #section-text span { position: absolute; left: 0; top: 0; line-height: 52px; font-family: var(--head); font-weight: 600; font-size: 40px; letter-spacing: 0.06em; color: var(--gold); opacity: 0; white-space: nowrap; }
+
+      /* hero FCPO */
+      #hero { position: absolute; left: 60px; top: 440px; width: 960px; height: 1080px; border-radius: 30px; overflow: hidden;
+        background: linear-gradient(160deg, rgba(34,197,94,0.16), rgba(255,255,255,0.04) 55%); border: 2px solid rgba(34,197,94,0.45); opacity: 0; }
+      #hero .cat { position: absolute; left: 50px; top: 46px; font-size: 30px; font-weight: 700; letter-spacing: 0.16em; color: var(--muted); }
+      #hero .name { position: absolute; left: 50px; top: 92px; font-family: var(--head); font-weight: 700; font-size: 64px; letter-spacing: 0.02em; }
+      #hero .val { position: absolute; left: 44px; top: 230px; font-family: var(--head); font-weight: 700; font-size: 250px; line-height: 1; letter-spacing: -0.01em; }
+      #hero .unit { position: absolute; left: 54px; top: 520px; font-size: 40px; font-weight: 600; color: var(--muted); }
+      #hero .chg { position: absolute; right: 50px; top: 530px; padding: 14px 30px; border-radius: 18px; background: var(--up); color: #052e14; font-family: var(--head); font-weight: 700; font-size: 64px; }
+      #hero .arrow { position: absolute; right: 60px; top: 60px; width: 0; height: 0; border-left: 70px solid transparent; border-right: 70px solid transparent; border-bottom: 110px solid var(--up); opacity: 0.9; }
+
+      #hero .rel { position: absolute; left: 50px; right: 50px; top: 700px; border-top: 2px solid var(--line); padding-top: 26px; }
+      #hero .rel .t { font-size: 30px; font-weight: 700; letter-spacing: 0.12em; color: var(--muted); }
+      #hero .rel .row { display: flex; gap: 16px; margin-top: 18px; }
+      #hero .rc { flex: 1; padding: 18px 20px; border-radius: 18px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); opacity: 0; }
+      #hero .rc small { display: block; font-size: 28px; font-weight: 700; color: var(--muted); }
+      #hero .rc b { display: block; margin-top: 6px; font-family: var(--head); font-weight: 700; font-size: 46px; color: #fca5a5; }
+      #hero .note { position: absolute; left: 50px; right: 50px; top: 960px; font-size: 32px; font-weight: 600; color: #dbe4ff; opacity: 0; }
+      /* market grid */
+      #grid { position: absolute; left: 60px; top: 440px; width: 960px; }
+      .card { position: absolute; width: 470px; height: 236px; border-radius: 24px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); overflow: hidden; opacity: 0; }
+      .card::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 8px; background: var(--c); }
+      .card .cat { position: absolute; left: 30px; top: 20px; font-size: 28px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); }
+      .card .name { position: absolute; left: 30px; top: 58px; font-size: 34px; font-weight: 800; white-space: nowrap; }
+      .card .val { position: absolute; left: 30px; top: 108px; font-family: var(--head); font-weight: 700; font-size: 66px; line-height: 1; }
+      .card .unit { position: absolute; left: 32px; top: 186px; font-size: 28px; font-weight: 600; color: var(--muted); }
+      .card .chg { position: absolute; right: 22px; top: 172px; padding: 4px 14px; border-radius: 12px; font-family: var(--head); font-weight: 700; font-size: 34px; background: var(--c); color: #fff; }
+      .card.up .chg { color: #052e14; }
+      .card.na .val { color: var(--na); }
+
+      #tally { position: absolute; left: 60px; top: 1470px; width: 960px; height: 84px; display: flex; gap: 16px; opacity: 0; }
+      #tally div { flex: 1; border-radius: 18px; display: flex; align-items: center; justify-content: center; gap: 12px; font-family: var(--head); font-weight: 700; font-size: 40px; }
+      #tally .u { background: rgba(34,197,94,0.16); color: #86efac; border: 2px solid rgba(34,197,94,0.5); }
+      #tally .d { background: rgba(239,68,68,0.16); color: #fca5a5; border: 2px solid rgba(239,68,68,0.5); }
+      #tally .n { background: rgba(100,116,139,0.18); color: #cbd5e1; border: 2px solid rgba(100,116,139,0.5); }
+
+      /* what happened */
+      .news { position: absolute; left: 60px; width: 960px; height: 340px; border-radius: 26px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); opacity: 0; overflow: hidden; }
+      .news .ic { position: absolute; left: 34px; top: 40px; width: 110px; height: 110px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+      .news .ic::after { content: ""; width: 0; height: 0; border-left: 26px solid transparent; border-right: 26px solid transparent; }
+      .news.up .ic { background: rgba(34,197,94,0.18); border: 3px solid var(--up); }
+      .news.up .ic::after { border-bottom: 40px solid var(--up); margin-top: -6px; }
+      .news.down .ic { background: rgba(239,68,68,0.18); border: 3px solid var(--down); }
+      .news.down .ic::after { border-top: 40px solid var(--down); margin-top: 6px; }
+      .news .hd { position: absolute; left: 174px; top: 40px; right: 34px; font-family: var(--head); font-weight: 700; font-size: 54px; line-height: 1.05; letter-spacing: 0.01em; }
+      .news .tx { position: absolute; left: 174px; top: 124px; right: 40px; font-size: 38px; font-weight: 600; line-height: 1.32; color: #dbe4ff; }
+      #n1 { top: 440px; } #n2 { top: 810px; } #n3 { top: 1180px; }
+
+      /* watch list */
+      .watch { position: absolute; left: 60px; width: 960px; border-radius: 26px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); opacity: 0; }
+      #w1 { top: 440px; height: 560px; } #w2 { top: 1030px; height: 500px; }
+      .watch .num { position: absolute; left: 34px; top: 30px; width: 64px; height: 64px; border-radius: 16px; background: var(--gold); color: #111; font-family: var(--head); font-weight: 700; font-size: 44px; display: flex; align-items: center; justify-content: center; }
+      .watch .q { position: absolute; left: 120px; top: 28px; right: 34px; font-family: var(--head); font-weight: 700; font-size: 50px; line-height: 1.08; }
+      #lvl { position: absolute; left: 60px; top: 220px; width: 840px; height: 300px; }
+      #lvl .zone { position: absolute; left: 0; right: 0; top: 170px; bottom: 0; border-radius: 0 0 18px 18px; background: linear-gradient(180deg, rgba(239,68,68,0.18), rgba(239,68,68,0)); }
+      #lvl .line { position: absolute; left: 0; right: 0; top: 168px; height: 0; border-top: 4px dashed var(--gold); transform-origin: 0 50%; }
+      #lvl .ll { position: absolute; left: 0; top: 182px; font-size: 32px; font-weight: 800; color: var(--gold); }
+      #lvl .ll small { display: block; font-size: 28px; font-weight: 600; color: var(--muted); }
+      #lvl .dot { position: absolute; left: 600px; top: 60px; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: var(--up); box-shadow: 0 0 0 10px rgba(34,197,94,0.25), 0 0 30px rgba(34,197,94,0.8); }
+      #lvl .dl { position: absolute; left: 640px; top: 30px; font-family: var(--head); font-weight: 700; font-size: 44px; color: #86efac; white-space: nowrap; }
+      #lvl .dl small { display: block; font-family: var(--body); font-size: 28px; font-weight: 600; color: var(--muted); }
+      #lvl .gap { position: absolute; left: 592px; top: 80px; width: 16px; height: 86px; border-left: 3px solid #86efac; border-bottom: 0; }
+      #lvl .gapt { position: absolute; left: 470px; top: 102px; padding: 4px 12px; border-radius: 10px; background: rgba(34,197,94,0.2); color: #86efac; font-family: var(--head); font-weight: 700; font-size: 34px; }
+      .chips { position: absolute; left: 120px; top: 180px; display: flex; gap: 18px; }
+      .chip { padding: 16px 22px; border-radius: 18px; background: rgba(255,255,255,0.06); border: 1.5px solid var(--line); opacity: 0; }
+      .chip small { display: block; font-size: 28px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; }
+      .chip b { display: block; font-family: var(--head); font-weight: 700; font-size: 50px; margin-top: 4px; }
+      .chip em { font-style: normal; font-family: var(--head); font-weight: 700; font-size: 32px; }
+      .chip .dn { color: #fca5a5; } .chip .nn { color: #cbd5e1; }
+      #w2 .tx { position: absolute; left: 120px; top: 420px; right: 34px; font-size: 30px; font-weight: 600; color: var(--muted); opacity: 0; }
+
+      /* ticker */
+      #ticker { position: absolute; left: 0; top: 1600px; width: 1080px; height: 76px; background: rgba(5,9,22,0.92); border-top: 2px solid var(--red); overflow: hidden; opacity: 0; }
+      #t-label { position: absolute; left: 0; top: 0; height: 76px; padding: 0 24px; background: var(--red); display: flex; align-items: center; font-family: var(--head); font-weight: 700; font-size: 36px; letter-spacing: 0.06em; z-index: 2; }
+      #t-clip { position: absolute; left: 200px; right: 0; top: 0; height: 76px; overflow: hidden; }
+      #t-run { position: absolute; left: 20px; top: 0; height: 76px; display: flex; align-items: center; white-space: nowrap; font-family: var(--head); font-weight: 600; font-size: 36px; }
+      #t-run span { margin-right: 46px; }
+      #t-run .u { color: #bbf7d0; } #t-run .d { color: #fecaca; } #t-run .n { color: #e2e8f0; }
+
+      /* outro */
+      #outro { position: absolute; inset: 0; opacity: 0; }
+      #o-pre { position: absolute; left: 0; top: 700px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #o-url { position: absolute; left: 50%; top: 780px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; padding: 30px 50px 30px 34px; border-radius: 999px; background: #fff; color: #0b1020;
+        box-shadow: 0 30px 80px rgba(225,29,72,0.35), 0 0 0 6px rgba(225,29,72,0.5); white-space: nowrap; }
+      #o-url .globe { width: 76px; height: 76px; border-radius: 50%; background: #16a34a; position: relative; flex: none; box-shadow: inset 0 0 0 5px #15803d; }
+      #o-url .globe::before, #o-url .globe::after { content: ""; position: absolute; border: 4px solid #fff; border-radius: 50%; }
+      #o-url .globe::before { left: 22px; right: 22px; top: 8px; bottom: 8px; }
+      #o-url .globe::after { left: 8px; right: 8px; top: 30px; bottom: 30px; border-radius: 4px; border-width: 4px 0; }
+      #o-url b { font-family: var(--body); font-size: 84px; font-weight: 800; letter-spacing: -0.02em; }
+      #o-url b span { color: #16a34a; }
+      #o-sub { position: absolute; left: 90px; top: 1000px; width: 900px; text-align: center; font-size: 40px; font-weight: 800; line-height: 1.25; }
+      #o-sub em { font-style: normal; color: var(--gold); }
+      #o-dis { position: absolute; left: 90px; top: 1100px; width: 900px; text-align: center; font-size: 28px; font-weight: 600; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="38" data-width="1080" data-height="1920">
+      <div id="dots"></div>
+      <div id="streak"></div>
+
+      <div id="intro">
+        <div class="bar" id="bar1"></div>
+        <div class="bar" id="bar2"></div>
+        <div id="i-title">Ringkasan<br />Pasaran Pagi</div>
+        <div id="i-date">Isnin · 16 November 2026</div>
+      </div>
+
+      <div id="header" data-layout-allow-safe-zone>
+        <div id="h-tag"><i></i>PASARAN PAGI</div>
+        <div id="h-title">RINGKASAN PASARAN PAGI</div>
+        <div id="h-date">Isnin, 16 November 2026</div>
+      </div>
+      <div id="h-rule"></div>
+      <div id="section"><b></b><div id="section-text"><span id="sx1">SOROTAN UTAMA</span><span id="sx2">PAPAN PASARAN</span><span id="sx3">APA BERLAKU</span><span id="sx4">PERLU DIPERHATIKAN</span></div></div>
+
+      <div id="hero">
+        <div class="arrow"></div>
+        <div class="cat">KOMODITI · SAWIT</div>
+        <div class="name">FCPO CONTINUOUS</div>
+        <div class="val">RM<span id="hv">0</span></div>
+        <div class="unit">per tan</div>
+        <div class="chg">▲ +0.50%</div>
+        <div class="rel"><div class="t">PASARAN BERKAITAN</div>
+          <div class="row"><div class="rc"><small>Soy Oil</small><b>▼ 0.11%</b></div><div class="rc"><small>WTI</small><b>▼ 0.42%</b></div><div class="rc"><small>USD/MYR</small><b>▼ 0.02%</b></div></div>
+        </div>
+        <div class="note">FCPO kekal hijau walaupun pasaran berkaitan lemah.</div>
+      </div>
+
+      <div id="grid"></div>
+      <div id="tally"><div class="u">▲ 2 NAIK</div><div class="d">▼ 5 TURUN</div><div class="n">● 2 TIADA DATA</div></div>
+
+      <div class="news up" id="n1"><div class="ic"></div><div class="hd">FCPO MASIH KUKUH</div><div class="tx">FCPO masih kukuh pada awal pagi walaupun soy oil sedikit lemah.</div></div>
+      <div class="news down" id="n2"><div class="ic"></div><div class="hd">WTI SUSUT KECIL</div><div class="tx">Sokongan daripada pasaran tenaga belum begitu jelas.</div></div>
+      <div class="news down" id="n3"><div class="ic"></div><div class="hd">NIAGA HADAPAN AS MERAH</div><div class="tx">NQ lebih lemah, sentimen risiko masih berhati-hati.</div></div>
+
+      <div class="watch" id="w1">
+        <div class="num">1</div>
+        <div class="q">Mampukah FCPO kekal di atas RM4,400/tan ketika dagangan aktif?</div>
+        <div id="lvl">
+          <div class="zone"></div>
+          <div class="line"></div>
+          <div class="ll">RM4,400<small>paras untuk diperhati</small></div>
+          <div class="gap"></div>
+          <div class="gapt">+62</div>
+          <div class="dot"></div>
+          <div class="dl">RM4,462<small>harga pagi ini</small></div>
+        </div>
+      </div>
+      <div class="watch" id="w2">
+        <div class="num">2</div>
+        <div class="q">Pembukaan Bursa &amp; hala tuju ringgit</div>
+        <div class="chips">
+          <div class="chip" id="ch1"><small>USD/MYR</small><b>4.0840</b><em class="dn">▼ 0.02%</em></div>
+          <div class="chip" id="ch2"><small>FBM KLCI</small><b>N/A</b><em class="nn">menunggu pembukaan</em></div>
+        </div>
+        <div class="tx">Selepas USD/MYR susut tipis pagi ini.</div>
+      </div>
+
+      <div id="ticker" data-layout-allow-safe-zone>
+        <div id="t-label">TERKINI</div>
+        <div id="t-clip" data-layout-ignore><div id="t-run" data-layout-ignore></div></div>
+      </div>
+
+      <div id="outro" data-layout-allow-safe-zone>
+        <div id="o-pre">Ringkasan pasaran setiap pagi di</div>
+        <div id="o-url"><div class="globe"></div><b>trader<span>sawit</span>.com</b></div>
+        <div id="o-sub">Follow untuk <em>update pasaran</em> harian</div>
+        <div id="o-dis">Maklumat untuk rujukan sahaja, bukan nasihat pelaburan.</div>
+      </div>
+
+      <!-- sound effects (no music) -->
+      <audio id="a-sting" src="assets/sfx/sting.wav" data-start="0" data-duration="2.6" data-volume="0.7"></audio>
+      <audio id="a-wh0" src="assets/sfx/whoosh.wav" data-start="0.35" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-wh1" src="assets/sfx/whoosh.wav" data-start="2.75" data-duration="0.55" data-volume="0.4"></audio>
+      <audio id="a-b1" src="assets/sfx/blip.wav" data-start="3.3" data-duration="0.32" data-volume="0.5"></audio>
+      <audio id="a-hit1" src="assets/sfx/hit.wav" data-start="3.6" data-duration="0.9" data-volume="0.45"></audio>
+      <audio id="a-ding1" src="assets/sfx/ding.wav" data-start="5.15" data-duration="1.6" data-volume="0.35"></audio>
+      <audio id="a-b2" src="assets/sfx/blip.wav" data-start="8.0" data-duration="0.32" data-volume="0.5"></audio>
+      <audio id="a-p1" src="assets/sfx/pop.wav" data-start="8.4" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p2" src="assets/sfx/pop.wav" data-start="8.95" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p3" src="assets/sfx/pop.wav" data-start="9.5" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p4" src="assets/sfx/pop.wav" data-start="10.05" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p5" src="assets/sfx/pop.wav" data-start="10.6" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p6" src="assets/sfx/pop.wav" data-start="11.15" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p7" src="assets/sfx/pop.wav" data-start="11.7" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p8" src="assets/sfx/pop.wav" data-start="12.25" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-sw1" src="assets/sfx/swipe.wav" data-start="13.4" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="a-b3" src="assets/sfx/blip.wav" data-start="17.5" data-duration="0.32" data-volume="0.5"></audio>
+      <audio id="a-hit2" src="assets/sfx/hit.wav" data-start="17.8" data-duration="0.9" data-volume="0.4"></audio>
+      <audio id="a-sw2" src="assets/sfx/swipe.wav" data-start="20.6" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="a-sw3" src="assets/sfx/swipe.wav" data-start="23.4" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="a-b4" src="assets/sfx/blip.wav" data-start="26.5" data-duration="0.32" data-volume="0.5"></audio>
+      <audio id="a-hit3" src="assets/sfx/hit.wav" data-start="26.8" data-duration="0.9" data-volume="0.4"></audio>
+      <audio id="a-p9" src="assets/sfx/pop.wav" data-start="28.6" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="a-sw4" src="assets/sfx/swipe.wav" data-start="30.6" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="a-p10" src="assets/sfx/pop.wav" data-start="31.3" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-p11" src="assets/sfx/pop.wav" data-start="31.6" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-wh2" src="assets/sfx/whoosh.wav" data-start="33.9" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-imp" src="assets/sfx/impact.wav" data-start="34.2" data-duration="1.2" data-volume="0.45"></audio>
+      <audio id="a-ding2" src="assets/sfx/ding.wav" data-start="34.6" data-duration="1.6" data-volume="0.35"></audio>
+    </div>
+
+    <script>
+      // ---- data, as supplied (16 Nov 2026 morning) ----
+      const MK = [
+        { cat: "KOMODITI", name: "DCE Palm Olein", val: null, unit: "", chg: null },
+        { cat: "TENAGA", name: "WTI Crude Oil", val: 88.19, dp: 2, pre: "US$", unit: "setong", chg: -0.42 },
+        { cat: "KOMODITI", name: "CBOT Soybean Oil", val: 63.70, dp: 2, pre: "", unit: "sen AS/lb", chg: -0.11 },
+        { cat: "KOMODITI", name: "CBOT Corn", val: 445.75, dp: 2, pre: "", unit: "sen AS/bu", chg: 0.06 },
+        { cat: "MATA WANG", name: "USD/MYR", val: 4.084, dp: 4, pre: "", unit: "ringgit", chg: -0.02 },
+        { cat: "EKUITI", name: "FBM KLCI", val: null, unit: "", chg: null },
+        { cat: "NIAGA HADAPAN AS", name: "E-mini S&P 500", val: 7575.0, dp: 2, pre: "", unit: "mata", chg: -0.11 },
+        { cat: "NIAGA HADAPAN AS", name: "E-mini Nasdaq-100", val: 27949.5, dp: 2, pre: "", unit: "mata", chg: -0.30 },
+      ];
+      const fmt = (v, dp) => v.toLocaleString("en-US", { minimumFractionDigits: dp, maximumFractionDigits: dp });
+      const pct = (c) => (c > 0 ? "▲ +" : "▼ ") + Math.abs(c).toFixed(2) + "%";
+
+      const grid = document.getElementById("grid");
+      MK.forEach((m, i) => {
+        const d = document.createElement("div");
+        const cls = m.val === null ? "na" : m.chg >= 0 ? "up" : "down";
+        d.className = "card " + cls; d.id = "card" + i;
+        d.style.left = (i % 2) * 490 + "px"; d.style.top = Math.floor(i / 2) * 252 + "px";
+        d.style.setProperty("--c", cls === "na" ? "var(--na)" : cls === "up" ? "var(--up)" : "var(--down)");
+        d.innerHTML = `<div class="cat">${m.cat}</div><div class="name">${m.name}</div>` +
+          `<div class="val">${m.val === null ? "N/A" : (m.pre || "") + '<span id="cv' + i + '">0</span>'}</div>` +
+          `<div class="unit">${m.val === null ? "tiada data" : m.unit}</div>` +
+          `<div class="chg">${m.val === null ? "—" : pct(m.chg)}</div>`;
+        grid.appendChild(d);
+      });
+
+      // ticker text (two copies so it can loop)
+      const TK = [["FCPO", "RM4,462", 0.5], ["WTI", "US$88.19", -0.42], ["SOY OIL", "63.70", -0.11], ["CORN", "445.75", 0.06],
+                  ["USD/MYR", "4.0840", -0.02], ["S&P 500", "7,575.00", -0.11], ["NASDAQ-100", "27,949.50", -0.30], ["DCE OLEIN", "N/A", null], ["FBM KLCI", "N/A", null]];
+      const run = document.getElementById("t-run");
+      const once = TK.map(([n, v, c]) => `<span>${n} ${v} <b class="${c === null ? "n" : c >= 0 ? "u" : "d"}">${c === null ? "—" : pct(c)}</b></span>`).join("");
+      run.innerHTML = once + once;
+
+      const tl = gsap.timeline({ paused: true });
+      const TOTAL = 38;
+
+      // background drift
+      tl.fromTo("#streak", { x: 0 }, { x: 1900, duration: 6, ease: "none", repeat: 5 }, 0);
+
+      // ---- intro sting ----
+      tl.fromTo("#bar1", { xPercent: -110 }, { xPercent: 0, duration: 0.5, ease: "power4.out" }, 0.1);
+      tl.fromTo("#bar2", { xPercent: 110 }, { xPercent: 0, duration: 0.5, ease: "power4.out" }, 0.2);
+      tl.fromTo("#i-title", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power4.out" }, 0.7);
+      tl.fromTo("#i-date", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 1.05);
+      tl.to("#bar1", { xPercent: 110, duration: 0.45, ease: "power3.in" }, 2.6);
+      tl.to("#bar2", { xPercent: -110, duration: 0.45, ease: "power3.in" }, 2.65);
+      tl.to(["#i-title", "#i-date"], { opacity: 0, y: -60, duration: 0.35, ease: "power2.in" }, 2.65);
+      tl.fromTo("#header", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 3.0);
+      tl.fromTo("#h-rule", { opacity: 0, scaleX: 0 }, { opacity: 1, scaleX: 1, duration: 0.5, ease: "power3.out" }, 3.2);
+      tl.fromTo("#ticker", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 3.1);
+      tl.fromTo("#t-run", { xPercent: 0 }, { xPercent: -50, duration: 26, ease: "none", repeat: 1 }, 3.1);
+      tl.fromTo("#h-tag i", { opacity: 1 }, { opacity: 0.2, duration: 0.5, yoyo: true, repeat: 33, ease: "sine.inOut" }, 3.0);
+
+      // section label
+      const SX = [[3.3, 1], [8.0, 2], [17.5, 3], [26.5, 4]];
+      tl.fromTo("#section", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 3.3);
+      SX.forEach(([t, n], i) => {
+        if (i > 0) tl.to("#sx" + SX[i - 1][1], { opacity: 0, y: -20, duration: 0.18 }, t - 0.05);
+        tl.fromTo("#sx" + n, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.25, ease: "power3.out" }, t + 0.05);
+      });
+
+      // ---- hero: FCPO ----
+      const hv = { v: 4300 };
+      tl.fromTo("#hero", { opacity: 0, y: 80, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 3.5);
+      tl.fromTo(hv, { v: 4300 }, { v: 4462, duration: 1.4, ease: "power3.out",
+        onUpdate: () => { document.getElementById("hv").textContent = fmt(Math.round(hv.v), 0); } }, 3.7);
+      tl.fromTo("#hero .chg", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(3)" }, 5.1);
+      tl.fromTo("#hero .arrow", { opacity: 0, y: 40 }, { opacity: 0.9, y: 0, duration: 0.4, ease: "back.out(2)" }, 5.1);
+      tl.to("#hero .arrow", { y: -12, duration: 0.6, yoyo: true, repeat: 3, ease: "sine.inOut" }, 5.5);
+      tl.fromTo("#hero .rc", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.15, ease: "back.out(2)" }, 5.8);
+      tl.fromTo("#hero .note", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 6.5);
+      tl.to("#hero", { opacity: 0, x: -200, duration: 0.4, ease: "power2.in" }, 7.7);
+
+      // ---- market board ----
+      MK.forEach((m, i) => {
+        const t = 8.3 + i * 0.55;
+        tl.fromTo("#card" + i, { opacity: 0, y: 40, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.8)" }, t);
+        if (m.val !== null) {
+          const o = { v: m.val * 0.9 };
+          tl.fromTo(o, { v: m.val * 0.9 }, { v: m.val, duration: 0.9, ease: "power3.out",
+            onUpdate: () => { document.getElementById("cv" + i).textContent = fmt(o.v, m.dp); } }, t + 0.05);
+        }
+      });
+      tl.fromTo("#tally", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 13.4);
+      tl.fromTo("#tally div", { scale: 0.8 }, { scale: 1, duration: 0.35, stagger: 0.12, ease: "back.out(3)", immediateRender: false }, 13.4);
+      tl.to(["#grid", "#tally"], { opacity: 0, y: -40, duration: 0.4, ease: "power2.in" }, 17.0);
+
+      // ---- what happened ----
+      [["#n1", 17.9], ["#n2", 20.6], ["#n3", 23.4]].forEach(([s, t]) => {
+        tl.fromTo(s, { opacity: 0, x: 140 }, { opacity: 1, x: 0, duration: 0.45, ease: "back.out(1.6)" }, t);
+        tl.fromTo(s + " .ic", { scale: 0.3, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.45, ease: "back.out(3)", immediateRender: false }, t + 0.15);
+      });
+      tl.to(["#n1", "#n2", "#n3"], { opacity: 0, y: -40, duration: 0.4, stagger: 0.06, ease: "power2.in" }, 26.0);
+
+      // ---- what to watch ----
+      tl.fromTo("#w1", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, 26.9);
+      tl.fromTo("#lvl .line", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, 27.4);
+      tl.fromTo("#lvl .ll", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.35 }, 27.8);
+      tl.fromTo("#lvl .zone", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 27.6);
+      tl.fromTo("#lvl .dot", { opacity: 0, y: 140 }, { opacity: 1, y: 0, duration: 0.6, ease: "back.out(2)" }, 28.3);
+      tl.fromTo("#lvl .dl", { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.35 }, 28.6);
+      tl.fromTo(["#lvl .gap", "#lvl .gapt"], { opacity: 0 }, { opacity: 1, duration: 0.35 }, 29.0);
+      tl.to("#lvl .dot", { scale: 1.2, duration: 0.5, yoyo: true, repeat: 3, ease: "sine.inOut" }, 29.2);
+      tl.fromTo("#w2", { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, 30.6);
+      tl.fromTo("#ch1", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, 31.3);
+      tl.fromTo("#ch2", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, 31.6);
+      tl.fromTo("#w2 .tx", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 32.0);
+
+      // ---- outro ----
+      tl.to(["#w1", "#w2", "#section", "#header", "#h-rule"], { opacity: 0, duration: 0.4, ease: "power2.in" }, 33.7);
+      tl.set("#outro", { opacity: 1 }, 34.0);
+      tl.fromTo("#o-pre", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 34.1);
+      tl.fromTo("#o-url", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 34.25);
+      tl.fromTo("#o-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 34.8);
+      tl.fromTo("#o-dis", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 35.2);
+      tl.to("#o-url", { scale: 1.05, duration: 0.45, yoyo: true, repeat: 3, ease: "sine.inOut" }, 35.3);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
