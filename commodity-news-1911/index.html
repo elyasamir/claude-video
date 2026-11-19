@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@500;600;700;800&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #060b1a; --bg2: #0c1733; --ink: #ffffff; --muted: #9fb0d4; --line: rgba(255,255,255,0.14);
+        --red: #e11d48; --up: #22c55e; --down: #ef4444; --neu: #f59e0b; --gold: #facc15;
+        --head: "Oswald", Arial, sans-serif; --body: "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--body); color: var(--ink);
+        background: radial-gradient(1100px 800px at 80% 10%, #1a2c63 0%, rgba(26,44,99,0) 60%), linear-gradient(180deg, var(--bg2), var(--bg)); }
+      #dots { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.09) 1.6px, transparent 1.8px); background-size: 34px 34px; }
+      #streak { position: absolute; left: -400px; top: 0; width: 300px; height: 1920px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.06), rgba(255,255,255,0)); transform: skewX(-18deg); }
+
+      /* intro */
+      .bar { position: absolute; left: -200px; width: 1500px; height: 170px; transform: skewY(-8deg); }
+      #bar1 { top: 330px; background: var(--red); }
+      #bar2 { top: 500px; background: #1d4ed8; }
+      #i-title { position: absolute; left: 0; top: 330px; width: 1080px; text-align: center; font-family: var(--head); font-weight: 700; font-size: 132px; line-height: 0.98; text-transform: uppercase; text-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; }
+      #i-date { position: absolute; left: 0; top: 610px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #dbe4ff; opacity: 0; }
+
+      /* presenter (keyed photo) */
+      #anchor { position: absolute; left: 70px; top: 770px; width: 940px; height: 1150px; opacity: 0; }
+      #anchor img { position: absolute; left: 0; bottom: 0; width: 940px; height: auto; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55)); }
+      #anchor-glow { position: absolute; left: 140px; top: 860px; width: 800px; height: 800px; border-radius: 50%; background: radial-gradient(circle, rgba(225,29,72,0.35), rgba(225,29,72,0) 65%); opacity: 0; }
+      #strap { position: absolute; left: 0; top: 1500px; width: 1080px; opacity: 0; }
+      #strap .a { display: inline-block; margin-left: 40px; padding: 8px 22px; background: var(--red); font-family: var(--head); font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
+      #strap .b { margin-left: 40px; width: 760px; padding: 16px 24px; background: rgba(255,255,255,0.96); color: #0b1020; font-family: var(--head); font-weight: 700; font-size: 52px; line-height: 1.05; }
+      #strap .b small { display: block; font-family: var(--body); font-size: 28px; font-weight: 700; color: #334155; margin-top: 4px; }
+
+      /* header */
+      #header { position: absolute; left: 60px; top: 110px; width: 960px; opacity: 0; }
+      #h-tag { display: inline-flex; align-items: center; gap: 12px; padding: 6px 16px; background: var(--red); font-family: var(--head); font-weight: 600; font-size: 30px; letter-spacing: 0.08em; }
+      #h-tag i { width: 14px; height: 14px; border-radius: 50%; background: #fff; display: block; }
+      #h-title { margin-top: 10px; font-family: var(--head); font-weight: 700; font-size: 70px; line-height: 1; }
+      #h-date { margin-top: 8px; font-size: 30px; font-weight: 600; color: var(--muted); }
+      #avatar { position: absolute; right: 60px; top: 100px; width: 160px; height: 160px; border-radius: 50%; border: 5px solid var(--red); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; opacity: 0; }
+      #avatar img { width: 100%; height: 100%; display: block; }
+      #prog { position: absolute; left: 60px; top: 334px; width: 960px; height: 10px; display: flex; gap: 10px; opacity: 0; }
+      #prog div { flex: 1; border-radius: 5px; background: rgba(255,255,255,0.14); overflow: hidden; }
+      #prog div i { display: block; height: 100%; width: 100%; background: var(--gold); transform-origin: 0 50%; transform: scaleX(0); }
+
+      /* index */
+      #index { position: absolute; left: 60px; top: 400px; width: 960px; }
+      #index .t { font-family: var(--head); font-weight: 600; font-size: 40px; letter-spacing: 0.06em; color: var(--gold); opacity: 0; }
+      .ix { display: flex; align-items: center; gap: 24px; margin-top: 22px; padding: 18px 26px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); opacity: 0; }
+      .ix .e { font-size: 56px; width: 70px; text-align: center; }
+      .ix .c { font-family: var(--head); font-weight: 700; font-size: 44px; flex: 1; }
+      .ix .n { font-size: 30px; font-weight: 700; color: var(--muted); }
+
+      /* commodity slides */
+      .story { position: absolute; left: 60px; top: 380px; width: 960px; height: 1190px; opacity: 0; }
+      .s-top { position: absolute; left: 0; top: 0; width: 960px; height: 130px; display: flex; align-items: center; gap: 24px; }
+      .s-emo { width: 130px; height: 130px; border-radius: 30px; background: rgba(255,255,255,0.07); border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 76px; }
+      .s-cat { font-family: var(--head); font-weight: 700; font-size: 56px; line-height: 1; }
+      .s-cat small { display: block; margin-top: 8px; font-family: var(--body); font-size: 28px; font-weight: 700; letter-spacing: 0.14em; color: var(--muted); }
+      .s-num { margin-left: auto; font-family: var(--head); font-weight: 700; font-size: 44px; color: var(--muted); }
+      .s-num b { color: var(--gold); }
+      .item { position: absolute; left: 0; width: 960px; padding: 28px 32px 30px; border-radius: 26px; background: rgba(255,255,255,0.06); border: 1.5px solid var(--line); border-left: 10px solid var(--c); opacity: 0; }
+      .item.one { top: 170px; }
+      .item.two-a { top: 160px; }
+      .item.two-b { top: 680px; }
+      .item .chip { display: inline-flex; align-items: center; gap: 10px; padding: 4px 16px; border-radius: 10px; background: var(--c); color: #fff; font-family: var(--head); font-weight: 700; font-size: 30px; letter-spacing: 0.06em; }
+      .item.u .chip, .item.n .chip { color: #111; }
+      .item h2 { margin-top: 14px; font-family: var(--head); font-weight: 700; font-size: 54px; line-height: 1.1; }
+      .item .src { display: inline-block; margin-top: 14px; padding: 5px 14px; border-radius: 10px; background: rgba(255,255,255,0.09); font-size: 28px; font-weight: 700; color: #dbe4ff; }
+      .item p { margin-top: 16px; font-size: 34px; font-weight: 600; line-height: 1.36; color: #dbe4ff; }
+      .item.one h2 { font-size: 66px; }
+      .item.one p { font-size: 40px; }
+
+      .kes { position: absolute; left: 0; top: 880px; width: 960px; height: 170px; border-radius: 26px; display: flex; align-items: center; gap: 30px; padding: 0 36px; opacity: 0;
+        background: rgba(255,255,255,0.05); border: 2px solid var(--c); }
+      .kes .ar { width: 96px; height: 96px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: var(--c); color: #111;
+        font-family: var(--head); font-weight: 700; font-size: 54px; }
+      .kes.d .ar { color: #fff; }
+      .kes .k { font-size: 30px; font-weight: 800; letter-spacing: 0.14em; color: var(--muted); }
+      .kes .v { font-family: var(--head); font-weight: 700; font-size: 60px; line-height: 1.05; }
+      /* recap */
+      #recap { position: absolute; left: 60px; top: 400px; width: 960px; opacity: 0; }
+      #recap .t { font-family: var(--head); font-weight: 600; font-size: 40px; letter-spacing: 0.06em; color: var(--gold); }
+      #rgrid { position: relative; margin-top: 26px; height: 980px; }
+      .rt { position: absolute; width: 470px; height: 310px; border-radius: 26px; background: rgba(255,255,255,0.05); border: 2px solid var(--c); opacity: 0; }
+      .rt .e { position: absolute; left: 30px; top: 26px; font-size: 70px; }
+      .rt .c { position: absolute; left: 30px; top: 132px; font-family: var(--head); font-weight: 700; font-size: 46px; }
+      .rt .s { position: absolute; left: 30px; top: 200px; right: 26px; font-size: 30px; font-weight: 600; color: var(--muted); line-height: 1.3; }
+      .rt .tag { position: absolute; right: 26px; top: 34px; padding: 4px 14px; border-radius: 10px; background: var(--c); color: #111; font-family: var(--head); font-weight: 700; font-size: 32px; }
+      .rt.d .tag { color: #fff; }
+      #rsum { margin-top: 10px; display: flex; gap: 14px; height: 84px; opacity: 0; }
+      #rsum div { flex: 1; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-family: var(--head); font-weight: 700; font-size: 38px; }
+      #rsum .u { background: rgba(34,197,94,0.16); color: #86efac; border: 2px solid rgba(34,197,94,0.5); }
+      #rsum .d { background: rgba(239,68,68,0.16); color: #fca5a5; border: 2px solid rgba(239,68,68,0.5); }
+      #rsum .n { background: rgba(245,158,11,0.16); color: #fcd34d; border: 2px solid rgba(245,158,11,0.5); }
+
+      /* ticker */
+      #ticker { position: absolute; left: 0; top: 1600px; width: 1080px; height: 76px; background: rgba(5,9,22,0.92); border-top: 2px solid var(--red); overflow: hidden; opacity: 0; }
+      #t-label { position: absolute; left: 0; top: 0; height: 76px; padding: 0 24px; background: var(--red); display: flex; align-items: center; font-family: var(--head); font-weight: 700; font-size: 36px; letter-spacing: 0.06em; z-index: 2; }
+      #t-clip { position: absolute; left: 200px; right: 0; top: 0; height: 76px; overflow: hidden; }
+      #t-run { position: absolute; left: 20px; top: 0; height: 76px; display: flex; align-items: center; white-space: nowrap; font-family: var(--head); font-weight: 600; font-size: 36px; }
+      #t-run span { margin-right: 50px; }
+      #t-run b { color: var(--gold); font-weight: 700; }
+
+      /* outro */
+      #outro { position: absolute; inset: 0; opacity: 0; }
+      #o-pre { position: absolute; left: 0; top: 300px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #o-url { position: absolute; left: 50%; top: 380px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; padding: 30px 50px 30px 34px; border-radius: 999px; background: #fff; color: #0b1020;
+        box-shadow: 0 30px 80px rgba(225,29,72,0.35), 0 0 0 6px rgba(225,29,72,0.5); white-space: nowrap; }
+      #o-url .globe { width: 76px; height: 76px; border-radius: 50%; background: #16a34a; position: relative; flex: none; box-shadow: inset 0 0 0 5px #15803d; }
+      #o-url .globe::before, #o-url .globe::after { content: ""; position: absolute; border: 4px solid #fff; border-radius: 50%; }
+      #o-url .globe::before { left: 22px; right: 22px; top: 8px; bottom: 8px; }
+      #o-url .globe::after { left: 8px; right: 8px; top: 30px; bottom: 30px; border-radius: 4px; border-width: 4px 0; }
+      #o-url b { font-size: 84px; font-weight: 800; letter-spacing: -0.02em; }
+      #o-url b span { color: #16a34a; }
+      #o-sub { position: absolute; left: 90px; top: 590px; width: 900px; text-align: center; font-size: 40px; font-weight: 800; line-height: 1.25; }
+      #o-sub em { font-style: normal; color: var(--gold); }
+      #o-dis { position: absolute; left: 90px; top: 660px; width: 900px; text-align: center; font-size: 28px; font-weight: 600; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="64" data-width="1080" data-height="1920">
+      <div id="dots"></div>
+      <div id="streak"></div>
+
+      <div id="intro">
+        <div class="bar" id="bar1"></div>
+        <div class="bar" id="bar2"></div>
+        <div id="i-title">Berita<br />Komoditi</div>
+        <div id="i-date">Khamis · 19 November 2026</div>
+      </div>
+
+      <div id="anchor-glow"></div>
+      <div id="anchor"><img src="assets/img/presenter.png" alt="" /></div>
+      <div id="strap" data-layout-allow-safe-zone>
+        <div class="a">BERITA KOMODITI HARIAN</div>
+        <div class="b">9 berita, 6 komoditi<small>Sawit · Soya · Jagung · Minyak · Gas · Gandum</small></div>
+      </div>
+
+      <div id="header" data-layout-allow-safe-zone>
+        <div id="h-tag"><i></i>BERITA KOMODITI</div>
+        <div id="h-title">BERITA PENTING HARI INI</div>
+        <div id="h-date">Khamis, 19 November 2026</div>
+      </div>
+      <div id="avatar" data-layout-allow-safe-zone><img src="assets/img/avatar.png" alt="" /></div>
+      <div id="prog"></div>
+
+      <div id="index"><div class="t">DALAM BULETIN INI</div></div>
+      <div id="stories"></div>
+
+      <div id="recap">
+        <div class="t">RINGKASAN SENTIMEN</div>
+        <div id="rgrid"></div>
+        <div id="rsum"><div class="u">▲ 2 POSITIF</div><div class="d">▼ 5 NEGATIF</div><div class="n">● 2 PANTAU</div></div>
+      </div>
+
+      <div id="ticker" data-layout-allow-safe-zone>
+        <div id="t-label">TERKINI</div>
+        <div id="t-clip" data-layout-ignore><div id="t-run" data-layout-ignore></div></div>
+      </div>
+
+      <div id="outro" data-layout-allow-safe-zone>
+        <div id="o-pre">Berita komoditi setiap hari di</div>
+        <div id="o-url"><div class="globe"></div><b>trader<span>sawit</span>.com</b></div>
+        <div id="o-sub">Follow untuk <em>berita pasaran</em> harian</div>
+        <div id="o-dis">Maklumat untuk rujukan sahaja, bukan nasihat pelaburan.</div>
+      </div>
+
+      <!-- sound effects (no music) -->
+      <audio id="a-sting" src="assets/sfx/sting.wav" data-start="0" data-duration="2.6" data-volume="0.7"></audio>
+      <audio id="a-wh0" src="assets/sfx/whoosh.wav" data-start="0.35" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-wh1" src="assets/sfx/whoosh.wav" data-start="2.0" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-strap" src="assets/sfx/swipe.wav" data-start="2.55" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="a-wh2" src="assets/sfx/whoosh.wav" data-start="4.3" data-duration="0.55" data-volume="0.4"></audio>
+      <audio id="a-ix" src="assets/sfx/blip.wav" data-start="4.8" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="a-ixp1" src="assets/sfx/pop.wav" data-start="5.3" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="a-ixp2" src="assets/sfx/pop.wav" data-start="5.65" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="a-ixp3" src="assets/sfx/pop.wav" data-start="6.0" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="a-ixp4" src="assets/sfx/pop.wav" data-start="6.35" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="a-ixp5" src="assets/sfx/pop.wav" data-start="6.7" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="a-ixp6" src="assets/sfx/pop.wav" data-start="7.05" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="b0" src="assets/sfx/blip.wav" data-start="8.60" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="h0" src="assets/sfx/hit.wav" data-start="8.85" data-duration="0.9" data-volume="0.35"></audio>
+      <audio id="p0_0" src="assets/sfx/pop.wav" data-start="9.20" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="p0_1" src="assets/sfx/pop.wav" data-start="13.00" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="w1" src="assets/sfx/swipe.wav" data-start="17.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="b1" src="assets/sfx/blip.wav" data-start="17.60" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="p1_0" src="assets/sfx/pop.wav" data-start="18.20" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="w2" src="assets/sfx/swipe.wav" data-start="23.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="b2" src="assets/sfx/blip.wav" data-start="23.60" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="p2_0" src="assets/sfx/pop.wav" data-start="24.20" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="w3" src="assets/sfx/swipe.wav" data-start="29.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="b3" src="assets/sfx/blip.wav" data-start="29.60" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="p3_0" src="assets/sfx/pop.wav" data-start="30.20" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="p3_1" src="assets/sfx/pop.wav" data-start="34.00" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="w4" src="assets/sfx/swipe.wav" data-start="38.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="b4" src="assets/sfx/blip.wav" data-start="38.60" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="p4_0" src="assets/sfx/pop.wav" data-start="39.20" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="w5" src="assets/sfx/swipe.wav" data-start="44.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="b5" src="assets/sfx/blip.wav" data-start="44.60" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="p5_0" src="assets/sfx/pop.wav" data-start="45.20" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="p5_1" src="assets/sfx/pop.wav" data-start="49.00" data-duration="0.16" data-volume="0.4"></audio>
+      <audio id="kx1" src="assets/sfx/hit.wav" data-start="20.60" data-duration="0.9" data-volume="0.25"></audio>
+      <audio id="kx2" src="assets/sfx/hit.wav" data-start="26.60" data-duration="0.9" data-volume="0.25"></audio>
+      <audio id="kx4" src="assets/sfx/hit.wav" data-start="41.60" data-duration="0.9" data-volume="0.25"></audio>
+      <audio id="a-rcb" src="assets/sfx/blip.wav" data-start="53.6" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="a-rc" src="assets/sfx/hit.wav" data-start="53.7" data-duration="0.9" data-volume="0.4"></audio>
+      <audio id="a-wh3" src="assets/sfx/whoosh.wav" data-start="58.5" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-imp" src="assets/sfx/impact.wav" data-start="58.8" data-duration="1.2" data-volume="0.45"></audio>
+      <audio id="a-ding" src="assets/sfx/ding.wav" data-start="59.2" data-duration="1.6" data-volume="0.35"></audio>
+    </div>
+
+    <script>
+      // ---- 17 Nov 2026 headlines, grouped by commodity (as supplied) ----
+      // s: u = positive, d = negative, n = monitor / neutral
+      const ST = [
+        { e: "🌴", cat: "PALM OIL / FCPO", short: "Sawit", over: "d", rs: "Stok tinggi, tenaga lemah", items: [
+          { s: "d", h: "Stok tinggi dan tenaga lemah menekan harga sawit", src: "CMB News",
+            p: "Stok sawit tinggi serta kelemahan tenaga dan minyak sayuran memberi tekanan; sentimen kekal berhati-hati selagi faktor ini berlarutan." },
+          { s: "n", h: "Indonesia perkukuh produktiviti sawit", src: "ANTARA News",
+            p: "Fokus pasaran kekal pada bekalan jangka sederhana, walaupun kesan harga segera tidak pasti." } ] },
+        { e: "🌱", cat: "SOYBEAN OIL", short: "Minyak Soya", over: "u", rs: "Kukuh, CBOT mendatar", items: [
+          { s: "u", h: "Minyak soya kukuh ketika niaga hadapan kacang soya CBOT mendatar", src: "CMB News",
+            p: "Perbezaan harga serantau boleh mengehadkan hala tuju pasaran." } ] },
+        { e: "🌽", cat: "CORN / MAIZE", short: "Jagung", over: "n", rs: "Etanol bahan api maritim", items: [
+          { s: "n", h: "Kumpulan jagung dan etanol desak etanol sebagai bahan api maritim AS", src: "Ethanol Producer Magazine",
+            p: "Jika diterima, ia berpotensi menyokong permintaan jagung melalui rantaian biofuel." } ] },
+        { e: "🛢️", cat: "CRUDE OIL", short: "Minyak Mentah", over: "n", rs: "Stok naik vs risiko Timur Tengah", items: [
+          { s: "d", h: "Inventori minyak mentah AS meningkat 3.4 juta tong", src: "Oil and Gas Journal",
+            p: "Faktor ini cenderung menambah tekanan bekalan pada WTI dan Brent." },
+          { s: "u", h: "Ketegangan Timur Tengah menyokong pemulihan WTI", src: "FXStreet",
+            p: "Risiko gangguan bekalan kekal menjadi penimbang kepada isyarat inventori yang lemah." } ] },
+        { e: "🔥", cat: "NATURAL GAS", short: "Gas Asli", over: "d", rs: "Stok atas paras normal", items: [
+          { s: "d", h: "Inventori gas asli AS tamatkan musim suntikan di atas paras normal", src: "U.S. EIA",
+            p: "Menandakan penampan bekalan yang lebih selesa untuk pasaran." } ] },
+        { e: "🌾", cat: "WHEAT", short: "Gandum", over: "d", rs: "Bekalan global, El Niño", items: [
+          { s: "d", h: "Niaga hadapan soya, jagung dan gandum merosot", src: "CME Group",
+            p: "Bekalan global yang besar membebankan sentimen dan mengekalkan tekanan pada kompleks bijirin." },
+          { s: "d", h: "El Niño perbaiki prospek gandum musim sejuk AS", src: "Brownfield Ag News",
+            p: "Boleh mengurangkan premium cuaca jika keadaan kekal baik." } ] },
+      ];
+      const START = [8.6, 17.6, 23.6, 29.6, 38.6, 44.6], END = 53.6;
+      const COL = { u: "var(--up)", d: "var(--down)", n: "var(--neu)" };
+      const LBL = { u: "▲ POSITIF", d: "▼ NEGATIF", n: "● PANTAU" };
+      const TAG = { u: "▲", d: "▼", n: "●" };
+
+      const prog = document.getElementById("prog"), index = document.getElementById("index"),
+            stories = document.getElementById("stories"), rgrid = document.getElementById("rgrid");
+      ST.forEach((c, k) => {
+        prog.insertAdjacentHTML("beforeend", `<div><i id="pg${k}"></i></div>`);
+        index.insertAdjacentHTML("beforeend",
+          `<div class="ix" id="ix${k}"><div class="e">${c.e}</div><div class="c">${c.cat}</div><div class="n">${c.items.length} berita</div></div>`);
+        const two = c.items.length === 2;
+        const items = c.items.map((it, j) =>
+          `<div class="item ${it.s} ${two ? (j ? "two-b" : "two-a") : "one"}" id="it${k}_${j}" style="--c:${COL[it.s]}">
+             <div class="chip">${LBL[it.s]}</div><h2>${it.h}</h2><div class="src">Sumber: ${it.src}</div><p>${it.p}</p></div>`).join("");
+        stories.insertAdjacentHTML("beforeend", `
+          <div class="story" id="st${k}">
+            <div class="s-top"><div class="s-emo">${c.e}</div><div class="s-cat">${c.cat}<small>${c.items.length} BERITA</small></div><div class="s-num"><b>0${k + 1}</b>/06</div></div>
+            ${items}
+            ${two ? "" : `<div class="kes ${c.over}" id="ks${k}" style="--c:${COL[c.over]}"><div class="ar">${TAG[c.over]}</div><div><div class="k">KESAN</div><div class="v">${c.rs}</div></div></div>`}
+          </div>`);
+        rgrid.insertAdjacentHTML("beforeend",
+          `<div class="rt ${c.over}" id="rt${k}" style="--c:${COL[c.over]}; left:${(k % 2) * 490}px; top:${Math.floor(k / 2) * 330}px"><div class="e">${c.e}</div><div class="tag">${TAG[c.over]}</div><div class="c">${c.short}</div><div class="s">${c.rs}</div></div>`);
+      });
+      const run = document.getElementById("t-run");
+      const once = ST.flatMap((c) => c.items.map((it) => `<span><b>${c.short.toUpperCase()}</b> ${it.h} ${TAG[it.s]}</span>`)).join("");
+      run.innerHTML = once + once;
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#streak", { x: 0 }, { x: 1900, duration: 6, ease: "none", repeat: 11 }, 0);
+
+      // ---- intro: sting, then the presenter with a lower-third ----
+      tl.fromTo("#bar1", { xPercent: -110 }, { xPercent: 0, duration: 0.5, ease: "power4.out" }, 0.1);
+      tl.fromTo("#bar2", { xPercent: 110 }, { xPercent: 0, duration: 0.5, ease: "power4.out" }, 0.2);
+      tl.fromTo("#i-title", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power4.out" }, 0.7);
+      tl.fromTo("#i-date", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 1.05);
+      tl.fromTo("#anchor-glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 1.9);
+      tl.fromTo("#anchor", { opacity: 0, y: 260 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 2.0);
+      tl.fromTo("#strap .a", { opacity: 0, x: -200 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, 2.55);
+      tl.fromTo("#strap .b", { opacity: 0, x: -300 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 2.7);
+      tl.set("#strap", { opacity: 1 }, 2.55);
+      tl.to(["#bar1"], { xPercent: 110, duration: 0.45, ease: "power3.in" }, 4.2);
+      tl.to(["#bar2"], { xPercent: -110, duration: 0.45, ease: "power3.in" }, 4.25);
+      tl.to(["#i-title", "#i-date"], { opacity: 0, y: -60, duration: 0.35, ease: "power2.in" }, 4.2);
+      tl.to(["#anchor", "#anchor-glow"], { opacity: 0, y: 300, duration: 0.45, ease: "power2.in" }, 4.25);
+      tl.to("#strap", { opacity: 0, x: -200, duration: 0.3, ease: "power2.in" }, 4.2);
+
+      // header + avatar + ticker
+      tl.fromTo("#header", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 4.6);
+      tl.fromTo("#avatar", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.5)" }, 4.75);
+      tl.fromTo("#prog", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 4.8);
+      tl.fromTo("#ticker", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 4.7);
+      tl.fromTo("#t-run", { xPercent: 0 }, { xPercent: -50, duration: 27, ease: "none", repeat: 1 }, 4.7);
+      tl.fromTo("#h-tag i", { opacity: 1 }, { opacity: 0.2, duration: 0.5, yoyo: true, repeat: 55, ease: "sine.inOut" }, 4.6);
+
+      // index
+      tl.fromTo("#index .t", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.3 }, 4.9);
+      ST.forEach((c, k) => tl.fromTo("#ix" + k, { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.35, ease: "back.out(1.8)" }, 5.25 + k * 0.35));
+      tl.to("#index", { opacity: 0, y: -40, duration: 0.35, ease: "power2.in" }, 8.15);
+
+      // commodity slides
+      ST.forEach((c, k) => {
+        const t = START[k], next = START[k + 1] || END;
+        tl.fromTo("#st" + k, { opacity: 0, x: 160 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, t);
+        tl.fromTo(`#st${k} .s-emo`, { scale: 0.3, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2.5)", immediateRender: false }, t + 0.1);
+        c.items.forEach((it, j) => {
+          const ti = t + 0.55 + j * 3.8;
+          tl.fromTo(`#it${k}_${j}`, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 0.45, ease: "back.out(1.6)" }, ti);
+          tl.fromTo(`#it${k}_${j} .chip`, { scale: 0.4 }, { scale: 1, duration: 0.35, ease: "back.out(3)", immediateRender: false }, ti + 0.1);
+          tl.fromTo(`#it${k}_${j} p`, { opacity: 0 }, { opacity: 1, duration: 0.4 }, ti + 1.0);
+        });
+        if (c.items.length === 1) {
+          tl.fromTo("#ks" + k, { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(2)" }, t + 3.0);
+          tl.fromTo(`#ks${k} .ar`, { scale: 0.4 }, { scale: 1, duration: 0.4, ease: "back.out(3)", immediateRender: false }, t + 3.15);
+        }
+        tl.fromTo("#pg" + k, { scaleX: 0 }, { scaleX: 1, duration: next - t, ease: "none" }, t);
+        tl.to("#st" + k, { opacity: 0, x: -160, duration: 0.3, ease: "power2.in" }, next - 0.25);
+      });
+
+      // recap
+      tl.fromTo("#recap", { opacity: 0 }, { opacity: 1, duration: 0.3 }, END);
+      ST.forEach((c, k) => tl.fromTo("#rt" + k, { opacity: 0, y: 40, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.8)" }, END + 0.3 + k * 0.25));
+      tl.fromTo("#rsum", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, END + 2.0);
+      tl.to(["#recap", "#header", "#prog", "#avatar", "#ticker"], { opacity: 0, duration: 0.4, ease: "power2.in" }, END + 4.7);
+
+      // outro: presenter returns with tradersawit.com
+      const O = END + 5;   // 64.6
+      tl.set("#outro", { opacity: 1 }, O);
+      tl.fromTo("#o-pre", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, O + 0.1);
+      tl.fromTo("#o-url", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, O + 0.25);
+      tl.fromTo("#o-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, O + 0.8);
+      tl.fromTo("#o-dis", { opacity: 0 }, { opacity: 1, duration: 0.4 }, O + 1.1);
+      tl.fromTo("#anchor-glow", { opacity: 0, y: 0, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power2.out", immediateRender: false }, O + 0.2);
+      tl.fromTo("#anchor", { opacity: 0, y: 300 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", immediateRender: false }, O + 0.3);
+      tl.to("#o-url", { scale: 1.05, duration: 0.45, yoyo: true, repeat: 3, ease: "sine.inOut" }, O + 1.3);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
