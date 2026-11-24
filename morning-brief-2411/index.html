@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@500;600;700;800&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #060b1a; --bg2: #0c1733; --ink: #ffffff; --muted: #9fb0d4; --line: rgba(255,255,255,0.14);
+        --red: #e11d48; --up: #22c55e; --down: #ef4444; --neu: #f59e0b; --gold: #facc15; --sun: #fb923c;
+        --head: "Oswald", Arial, sans-serif; --body: "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--bg); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--body); color: var(--ink);
+        background: radial-gradient(1100px 800px at 80% 8%, #3a2a5c 0%, rgba(58,42,92,0) 55%), radial-gradient(900px 700px at 10% 30%, #1a2c63 0%, rgba(26,44,99,0) 60%), linear-gradient(180deg, var(--bg2), var(--bg)); }
+      #dots { position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.09) 1.6px, transparent 1.8px); background-size: 34px 34px; }
+      #streak { position: absolute; left: -400px; top: 0; width: 300px; height: 1920px; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.06), rgba(255,255,255,0)); transform: skewX(-18deg); }
+
+      /* intro: sunrise sting */
+      #sun { position: absolute; left: 290px; top: 230px; width: 500px; height: 500px; border-radius: 50%;
+        background: radial-gradient(circle, #fde68a 0%, #fb923c 45%, rgba(251,146,60,0) 70%); opacity: 0; }
+      .bar { position: absolute; left: -200px; width: 1500px; height: 170px; transform: skewY(-8deg); }
+      #bar1 { top: 330px; background: var(--sun); }
+      #bar2 { top: 500px; background: #1d4ed8; }
+      #i-kick { position: absolute; left: 0; top: 270px; width: 1080px; text-align: center; font-size: 34px; font-weight: 800; letter-spacing: 0.3em; color: #fde68a; opacity: 0; }
+      #i-title { position: absolute; left: 0; top: 330px; width: 1080px; text-align: center; font-family: var(--head); font-weight: 700; font-size: 150px; line-height: 0.98; text-transform: uppercase; text-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; }
+      #i-date { position: absolute; left: 0; top: 650px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #dbe4ff; opacity: 0; }
+
+      #anchor { position: absolute; left: 70px; top: 770px; width: 940px; height: 1150px; opacity: 0; }
+      #anchor img { position: absolute; left: 0; bottom: 0; width: 940px; height: auto; filter: drop-shadow(0 30px 60px rgba(0,0,0,0.55)); }
+      #anchor-glow { position: absolute; left: 140px; top: 860px; width: 800px; height: 800px; border-radius: 50%; background: radial-gradient(circle, rgba(251,146,60,0.35), rgba(251,146,60,0) 65%); opacity: 0; }
+      #strap { position: absolute; left: 0; top: 1500px; width: 1080px; opacity: 0; }
+      #strap .a { display: inline-block; margin-left: 40px; padding: 8px 22px; background: var(--sun); color: #111; font-family: var(--head); font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
+      #strap .b { margin-left: 40px; width: 780px; padding: 16px 24px; background: rgba(255,255,255,0.96); color: #0b1020; font-family: var(--head); font-weight: 700; font-size: 52px; line-height: 1.05; }
+      #strap .b small { display: block; font-family: var(--body); font-size: 28px; font-weight: 700; color: #334155; margin-top: 4px; }
+
+      /* header */
+      #header { position: absolute; left: 60px; top: 110px; width: 960px; opacity: 0; }
+      #h-tag { display: inline-flex; align-items: center; gap: 12px; padding: 6px 16px; background: var(--sun); color: #111; font-family: var(--head); font-weight: 700; font-size: 30px; letter-spacing: 0.08em; }
+      #h-tag i { width: 14px; height: 14px; border-radius: 50%; background: #111; display: block; }
+      #h-title { margin-top: 10px; font-family: var(--head); font-weight: 700; font-size: 70px; line-height: 1; }
+      #h-date { margin-top: 8px; font-size: 30px; font-weight: 600; color: var(--muted); }
+      #avatar { position: absolute; right: 60px; top: 100px; width: 160px; height: 160px; border-radius: 50%; border: 5px solid var(--sun); box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; opacity: 0; }
+      #avatar img { width: 100%; height: 100%; display: block; }
+      #prog { position: absolute; left: 60px; top: 334px; width: 960px; height: 10px; display: flex; gap: 10px; opacity: 0; }
+      #prog div { flex: 1; border-radius: 5px; background: rgba(255,255,255,0.14); overflow: hidden; }
+      #prog div i { display: block; height: 100%; width: 100%; background: var(--gold); transform-origin: 0 50%; transform: scaleX(0); }
+
+      /* index */
+      #index { position: absolute; left: 60px; top: 400px; width: 960px; opacity: 0; }
+      #index .t { font-family: var(--head); font-weight: 600; font-size: 40px; letter-spacing: 0.06em; color: var(--gold); }
+      .ix { position: relative; margin-top: 26px; padding: 30px 34px 32px 150px; border-radius: 26px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); opacity: 0; }
+      .ix .e { position: absolute; left: 30px; top: 30px; width: 90px; height: 90px; border-radius: 22px; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 56px; }
+      .ix small { display: block; font-size: 28px; font-weight: 800; letter-spacing: 0.14em; color: var(--sun); }
+      .ix b { display: block; margin-top: 8px; font-family: var(--head); font-weight: 700; font-size: 50px; line-height: 1.1; }
+
+      /* story slides */
+      .slide { position: absolute; left: 60px; top: 380px; width: 960px; height: 1190px; opacity: 0; }
+      .s-top { display: flex; align-items: center; gap: 22px; height: 110px; }
+      .s-emo { width: 110px; height: 110px; border-radius: 28px; background: rgba(255,255,255,0.07); border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; font-size: 64px; flex: none; }
+      .s-cat { font-family: var(--head); font-weight: 700; font-size: 46px; line-height: 1; }
+      .s-cat small { display: block; margin-top: 8px; font-family: var(--body); font-size: 28px; font-weight: 800; letter-spacing: 0.14em; color: var(--sun); }
+      .s-num { margin-left: auto; font-family: var(--head); font-weight: 700; font-size: 40px; color: var(--muted); }
+      .s-num b { color: var(--gold); }
+      .s-head { margin-top: 26px; padding: 26px 30px 28px; border-radius: 24px; background: rgba(255,255,255,0.06); border: 1.5px solid var(--line); border-left: 10px solid var(--sun); }
+      .s-head h2 { font-family: var(--head); font-weight: 700; font-size: 56px; line-height: 1.1; }
+      .s-head .src { display: inline-block; margin-top: 14px; padding: 5px 14px; border-radius: 10px; background: rgba(255,255,255,0.09); font-size: 28px; font-weight: 700; color: #dbe4ff; }
+      .pts { margin-top: 26px; }
+      .pt { display: flex; gap: 20px; margin-top: 22px; opacity: 0; }
+      .pt i { flex: none; width: 46px; height: 46px; margin-top: 2px; border-radius: 12px; background: var(--gold); color: #111; font-style: normal; font-family: var(--head); font-weight: 700; font-size: 30px; display: flex; align-items: center; justify-content: center; }
+      .pt p { font-size: 35px; font-weight: 600; line-height: 1.34; color: #e2e8f0; }
+      .pt p b { color: #fff; font-weight: 800; }
+      .stats { display: flex; gap: 18px; margin-top: 26px; }
+      .st { flex: 1; padding: 22px 20px 24px; border-radius: 22px; background: rgba(255,255,255,0.06); border: 2px solid var(--line); opacity: 0; }
+      .st small { display: block; font-size: 28px; font-weight: 700; color: var(--muted); line-height: 1.2; }
+      .st b { display: block; margin-top: 8px; font-family: var(--head); font-weight: 700; font-size: 58px; line-height: 1; }
+      .st.g b { color: #86efac; } .st.y b { color: var(--gold); } .st.r b { color: #fca5a5; }
+      .quote { margin-top: 26px; padding: 30px 34px 32px; border-radius: 24px; background: linear-gradient(160deg, rgba(251,146,60,0.18), rgba(255,255,255,0.04)); border: 2px solid rgba(251,146,60,0.55); opacity: 0; }
+      .quote q { display: block; font-family: var(--head); font-weight: 600; font-size: 54px; line-height: 1.15; quotes: "“" "”"; }
+      .quote span { display: block; margin-top: 14px; font-size: 30px; font-weight: 700; color: var(--muted); }
+      .kes { position: absolute; left: 0; bottom: 0; width: 960px; height: 190px; border-radius: 26px; display: flex; align-items: center; gap: 28px; padding: 0 34px; opacity: 0;
+        background: rgba(255,255,255,0.05); border: 2px solid var(--c); }
+      .kes .ar { width: 92px; height: 92px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; background: var(--c); color: #111; font-family: var(--head); font-weight: 700; font-size: 52px; }
+      .kes .k { font-size: 28px; font-weight: 800; letter-spacing: 0.14em; color: var(--muted); }
+      .kes .v { font-family: var(--head); font-weight: 700; font-size: 46px; line-height: 1.12; margin-top: 4px; }
+
+      /* recap */
+      #recap { position: absolute; left: 60px; top: 400px; width: 960px; opacity: 0; }
+      #recap .t { font-family: var(--head); font-weight: 600; font-size: 40px; letter-spacing: 0.06em; color: var(--gold); }
+      .rc { position: relative; margin-top: 26px; padding: 30px 34px 34px 160px; border-radius: 26px; background: rgba(255,255,255,0.05); border: 2px solid var(--c); opacity: 0; }
+      .rc .ar { position: absolute; left: 34px; top: 34px; width: 92px; height: 92px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--c); color: #111; font-family: var(--head); font-weight: 700; font-size: 52px; }
+      .rc small { display: block; font-size: 28px; font-weight: 800; letter-spacing: 0.14em; color: var(--muted); }
+      .rc b { display: block; margin-top: 6px; font-family: var(--head); font-weight: 700; font-size: 50px; line-height: 1.1; }
+      .rc p { margin-top: 12px; font-size: 32px; font-weight: 600; line-height: 1.32; color: #dbe4ff; }
+
+      /* ticker */
+      #ticker { position: absolute; left: 0; top: 1600px; width: 1080px; height: 76px; background: rgba(5,9,22,0.92); border-top: 2px solid var(--sun); overflow: hidden; opacity: 0; }
+      #t-label { position: absolute; left: 0; top: 0; height: 76px; padding: 0 24px; background: var(--sun); color: #111; display: flex; align-items: center; font-family: var(--head); font-weight: 700; font-size: 36px; letter-spacing: 0.06em; z-index: 2; }
+      #t-clip { position: absolute; left: 200px; right: 0; top: 0; height: 76px; overflow: hidden; }
+      #t-run { position: absolute; left: 20px; top: 0; height: 76px; display: flex; align-items: center; white-space: nowrap; font-family: var(--head); font-weight: 600; font-size: 36px; }
+      #t-run span { margin-right: 50px; }
+      #t-run b { color: var(--gold); font-weight: 700; }
+
+      /* outro */
+      #outro { position: absolute; inset: 0; opacity: 0; }
+      #o-pre { position: absolute; left: 0; top: 300px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #o-url { position: absolute; left: 50%; top: 380px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; padding: 30px 50px 30px 34px; border-radius: 999px; background: #fff; color: #0b1020;
+        box-shadow: 0 30px 80px rgba(251,146,60,0.35), 0 0 0 6px rgba(251,146,60,0.55); white-space: nowrap; }
+      #o-url .globe { width: 76px; height: 76px; border-radius: 50%; background: #16a34a; position: relative; flex: none; box-shadow: inset 0 0 0 5px #15803d; }
+      #o-url .globe::before, #o-url .globe::after { content: ""; position: absolute; border: 4px solid #fff; border-radius: 50%; }
+      #o-url .globe::before { left: 22px; right: 22px; top: 8px; bottom: 8px; }
+      #o-url .globe::after { left: 8px; right: 8px; top: 30px; bottom: 30px; border-radius: 4px; border-width: 4px 0; }
+      #o-url b { font-size: 84px; font-weight: 800; letter-spacing: -0.02em; }
+      #o-url b span { color: #16a34a; }
+      #o-sub { position: absolute; left: 90px; top: 590px; width: 900px; text-align: center; font-size: 40px; font-weight: 800; line-height: 1.25; }
+      #o-sub em { font-style: normal; color: var(--gold); }
+      #o-dis { position: absolute; left: 90px; top: 660px; width: 900px; text-align: center; font-size: 28px; font-weight: 600; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="56" data-width="1080" data-height="1920">
+      <div id="dots"></div>
+      <div id="streak"></div>
+
+      <div id="sun"></div>
+      <div class="bar" id="bar1"></div>
+      <div class="bar" id="bar2"></div>
+      <div id="i-kick">☀ SELAMAT PAGI</div>
+      <div id="i-title">Morning<br />Brief</div>
+      <div id="i-date">Selasa · 24 November 2026</div>
+
+      <div id="anchor-glow"></div>
+      <div id="anchor"><img src="assets/img/presenter.png" alt="" /></div>
+      <div id="strap" data-layout-allow-safe-zone>
+        <div class="a">MORNING BRIEF</div>
+        <div class="b">Duti eksport sawit &amp; lonjakan soya<small>Ulasan pasaran · Berita semalaman</small></div>
+      </div>
+
+      <div id="header" data-layout-allow-safe-zone>
+        <div id="h-tag"><i></i>MORNING BRIEF</div>
+        <div id="h-title">RINGKASAN PAGI INI</div>
+        <div id="h-date">Selasa, 24 November 2026</div>
+      </div>
+      <div id="avatar" data-layout-allow-safe-zone><img src="assets/img/avatar.png" alt="" /></div>
+      <div id="prog"><div><i id="pg0"></i></div><div><i id="pg1"></i></div><div><i id="pg2"></i></div><div><i id="pg3"></i></div></div>
+
+      <div id="index">
+        <div class="t">DALAM BRIEF INI</div>
+        <div class="ix" id="ix0"><div class="e">🌴</div><small>ULASAN · SAWIT</small><b>Tetingkap pengecualian duti eksport CPO telah berlalu</b></div>
+        <div class="ix" id="ix1"><div class="e">🌱</div><small>BERITA SEMALAMAN · SOYA</small><b>Soya melonjak atas janji perjanjian dagangan Trump</b></div>
+      </div>
+
+      <!-- story 1a -->
+      <div class="slide" id="s0">
+        <div class="s-top"><div class="s-emo">🌴</div><div class="s-cat">ULASAN: SAWIT<small>APA BERLAKU</small></div><div class="s-num"><b>01</b>/02</div></div>
+        <div class="s-head"><h2>Industri sawit: tetingkap pengecualian duti eksport CPO telah berlalu</h2><div class="src">Sumber: Bloomberg</div></div>
+        <div class="pts">
+          <div class="pt" id="s0p0"><i>1</i><p>Tempoh pengecualian duti eksport untuk <b>melonjakkan penghantaran</b> dan <b>kurangkan stok</b> sudah berlalu.</p></div>
+          <div class="pt" id="s0p1"><i>2</i><p><b>Kumpulan Solidariti Minyak Sawit Malaysia</b> (14 persatuan, dari ladang hingga hiliran) gesa kerajaan umumkan keputusan.</p></div>
+          <div class="pt" id="s0p2"><i>3</i><p>Pembelian kini memasuki <b>musim perlahan</b>, jadi kesan pengecualian terhadap stok terhad.</p></div>
+        </div>
+      </div>
+
+      <!-- story 1b -->
+      <div class="slide" id="s1">
+        <div class="s-top"><div class="s-emo">🌴</div><div class="s-cat">ULASAN: SAWIT<small>ANGKA &amp; KESAN</small></div><div class="s-num"><b>01</b>/02</div></div>
+        <div class="stats">
+          <div class="st r" id="s1t0"><small>Stok sawit Malaysia</small><b>REKOD</b></div>
+          <div class="st y" id="s1t1"><small>Persatuan dalam kumpulan</small><b>14</b></div>
+          <div class="st y" id="s1t2"><small>Pengeluar sawit dunia</small><b>#2</b></div>
+        </div>
+        <div class="pts">
+          <div class="pt" id="s1p0"><i>!</i><p>Pengecualian boleh <b>menaikkan harga CPO</b> dan mendorong pembeli beralih ke <b>minyak sayuran pesaing</b>.</p></div>
+          <div class="pt" id="s1p1"><i>✓</i><p>Keputusan yang jelas akan <b>menamatkan spekulasi</b> dan membolehkan industri merancang.</p></div>
+          <div class="pt" id="s1p2"><i>i</i><p>Stok di paras rekod berpunca daripada <b>pengeluaran lebih kukuh</b> daripada jangkaan.</p></div>
+        </div>
+        <div class="kes" id="k1" style="--c: var(--neu)"><div class="ar">●</div><div><div class="k">KESAN KEPADA FCPO</div><div class="v">Ketidakpastian dasar, stok rekod kekal membebankan</div></div></div>
+      </div>
+
+      <!-- story 2a -->
+      <div class="slide" id="s2">
+        <div class="s-top"><div class="s-emo">🌱</div><div class="s-cat">BERITA SEMALAMAN: SOYA<small>APA BERLAKU</small></div><div class="s-num"><b>02</b>/02</div></div>
+        <div class="s-head"><h2>Niaga hadapan soya melonjak, Trump janji perjanjian dagangan "luar biasa"</h2><div class="src">Sumber: Bloomberg</div></div>
+        <div class="quote" id="s2q"><q>Mereka akan beli lebih banyak soya, lebih banyak segalanya.</q><span>Donald Trump, Presiden AS, di CNBC</span></div>
+        <div class="pts">
+          <div class="pt" id="s2p0"><i>1</i><p>Trump akan umumkan perjanjian dagangan melibatkan <b>pembelian besar kacang soya</b>.</p></div>
+          <div class="pt" id="s2p1"><i>2</i><p>Kenyataan dibuat selepas lawatan ke Asia dan pertemuan dengan <b>Xi Jinping</b> serta <b>Vladimir Putin</b>.</p></div>
+        </div>
+      </div>
+
+      <!-- story 2b -->
+      <div class="slide" id="s3">
+        <div class="s-top"><div class="s-emo">🌱</div><div class="s-cat">BERITA SEMALAMAN: SOYA<small>ANGKA &amp; KESAN</small></div><div class="s-num"><b>02</b>/02</div></div>
+        <div class="stats">
+          <div class="st g" id="s3t0"><small>Soya CBOT</small><b>+0.6%</b></div>
+          <div class="st y" id="s3t1"><small>Sebushel</small><b>US$<span id="sbv">12.2775</span></b></div>
+          <div class="st y" id="s3t2"><small>Perjanjian APEC</small><b>US$17B+</b></div>
+        </div>
+        <div class="pts">
+          <div class="pt" id="s3p0"><i>i</i><p>Soya naik <b>0.6% ke US$12.2775 sebushel</b> pada 10:46 pagi di Chicago.</p></div>
+          <div class="pt" id="s3p1"><i>i</i><p>Jumaat lalu, Trump umumkan perjanjian bernilai <b>lebih US$17 bilion</b> di sidang APEC, dengan <b>petani</b> antara penerima manfaat terbesar.</p></div>
+        </div>
+        <div class="kes" id="k3" style="--c: var(--up)"><div class="ar">▲</div><div><div class="k">KESAN</div><div class="v">Sokong sentimen soya &amp; kompleks minyak sayuran</div></div></div>
+      </div>
+
+      <div id="recap">
+        <div class="t">RUMUSAN PAGI INI</div>
+        <div class="rc" id="rc0" style="--c: var(--neu)"><div class="ar">●</div><small>SAWIT / FCPO · PANTAU</small><b>Tunggu keputusan duti eksport</b><p>Stok rekod dan musim pembelian perlahan; keputusan jelas kerajaan dinanti.</p></div>
+        <div class="rc" id="rc1" style="--c: var(--up)"><div class="ar">▲</div><small>SOYA · POSITIF</small><b>Harapan perjanjian dagangan AS</b><p>Janji pembelian besar soya angkat niaga hadapan CBOT.</p></div>
+      </div>
+
+      <div id="ticker" data-layout-allow-safe-zone>
+        <div id="t-label">TERKINI</div>
+        <div id="t-clip" data-layout-ignore><div id="t-run" data-layout-ignore></div></div>
+      </div>
+
+      <div id="outro" data-layout-allow-safe-zone>
+        <div id="o-pre">Morning brief setiap hari di</div>
+        <div id="o-url"><div class="globe"></div><b>trader<span>sawit</span>.com</b></div>
+        <div id="o-sub">Follow untuk <em>update pasaran</em> setiap pagi</div>
+        <div id="o-dis">Maklumat untuk rujukan sahaja, bukan nasihat pelaburan.</div>
+      </div>
+
+      <!-- sound effects (no music) -->
+      <audio id="a-sting" src="assets/sfx/sting.wav" data-start="0" data-duration="2.6" data-volume="0.7"></audio>
+      <audio id="a-wh0" src="assets/sfx/whoosh.wav" data-start="0.35" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-wh1" src="assets/sfx/whoosh.wav" data-start="2.0" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-strap" src="assets/sfx/swipe.wav" data-start="2.55" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="a-wh2" src="assets/sfx/whoosh.wav" data-start="4.3" data-duration="0.55" data-volume="0.4"></audio>
+      <audio id="a-ix" src="assets/sfx/blip.wav" data-start="4.8" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="a-ix1" src="assets/sfx/pop.wav" data-start="5.3" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="a-ix2" src="assets/sfx/pop.wav" data-start="5.75" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sb0" src="assets/sfx/blip.wav" data-start="8.6" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="sh0" src="assets/sfx/hit.wav" data-start="8.85" data-duration="0.9" data-volume="0.35"></audio>
+      <audio id="sp00" src="assets/sfx/pop.wav" data-start="10.2" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sp01" src="assets/sfx/pop.wav" data-start="12.4" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sp02" src="assets/sfx/pop.wav" data-start="14.6" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sw1" src="assets/sfx/swipe.wav" data-start="17.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="st10" src="assets/sfx/pop.wav" data-start="18.0" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="st11" src="assets/sfx/pop.wav" data-start="18.25" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="st12" src="assets/sfx/pop.wav" data-start="18.5" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sk1" src="assets/sfx/hit.wav" data-start="23.8" data-duration="0.9" data-volume="0.3"></audio>
+      <audio id="sw2" src="assets/sfx/swipe.wav" data-start="26.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="sb2" src="assets/sfx/blip.wav" data-start="26.6" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="sq2" src="assets/sfx/whoosh.wav" data-start="27.8" data-duration="0.55" data-volume="0.35"></audio>
+      <audio id="sp20" src="assets/sfx/pop.wav" data-start="30.2" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sp21" src="assets/sfx/pop.wav" data-start="32.2" data-duration="0.16" data-volume="0.35"></audio>
+      <audio id="sw3" src="assets/sfx/swipe.wav" data-start="35.45" data-duration="0.28" data-volume="0.4"></audio>
+      <audio id="st30" src="assets/sfx/ding.wav" data-start="36.0" data-duration="1.6" data-volume="0.35"></audio>
+      <audio id="sk3" src="assets/sfx/hit.wav" data-start="41.6" data-duration="0.9" data-volume="0.3"></audio>
+      <audio id="a-rcb" src="assets/sfx/blip.wav" data-start="44.6" data-duration="0.32" data-volume="0.45"></audio>
+      <audio id="a-rc" src="assets/sfx/hit.wav" data-start="44.7" data-duration="0.9" data-volume="0.4"></audio>
+      <audio id="a-wh3" src="assets/sfx/whoosh.wav" data-start="50.4" data-duration="0.55" data-volume="0.45"></audio>
+      <audio id="a-imp" src="assets/sfx/impact.wav" data-start="50.7" data-duration="1.2" data-volume="0.45"></audio>
+      <audio id="a-ding" src="assets/sfx/ding.wav" data-start="51.1" data-duration="1.6" data-volume="0.35"></audio>
+    </div>
+
+    <script>
+      const TK = [["SAWIT", "Tetingkap pengecualian duti eksport CPO telah berlalu ●"], ["SAWIT", "Stok Malaysia di paras rekod ▼"],
+                  ["SOYA", "Trump janji perjanjian dagangan besar ▲"], ["CBOT SOYA", "+0.6% ke US$12.2775/bushel ▲"], ["APEC", "Perjanjian lebih US$17 bilion"]];
+      const once = TK.map(([a, b]) => `<span><b>${a}</b> ${b}</span>`).join("");
+      document.getElementById("t-run").innerHTML = once + once;
+
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#streak", { x: 0 }, { x: 1900, duration: 6, ease: "none", repeat: 9 }, 0);
+
+      // intro: sunrise + sting
+      tl.fromTo("#sun", { opacity: 0, y: 220, scale: 0.6 }, { opacity: 0.9, y: 0, scale: 1, duration: 1.4, ease: "power2.out" }, 0);
+      tl.fromTo("#bar1", { xPercent: -110 }, { xPercent: 0, duration: 0.5, ease: "power4.out" }, 0.1);
+      tl.fromTo("#bar2", { xPercent: 110 }, { xPercent: 0, duration: 0.5, ease: "power4.out" }, 0.2);
+      tl.fromTo("#i-kick", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.55);
+      tl.fromTo("#i-title", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "power4.out" }, 0.7);
+      tl.fromTo("#i-date", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 1.05);
+      tl.fromTo("#anchor-glow", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.8, ease: "power2.out" }, 1.9);
+      tl.fromTo("#anchor", { opacity: 0, y: 260 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 2.0);
+      tl.set("#strap", { opacity: 1 }, 2.55);
+      tl.fromTo("#strap .a", { opacity: 0, x: -200 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, 2.55);
+      tl.fromTo("#strap .b", { opacity: 0, x: -300 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 2.7);
+      tl.to("#bar1", { xPercent: 110, duration: 0.45, ease: "power3.in" }, 4.2);
+      tl.to("#bar2", { xPercent: -110, duration: 0.45, ease: "power3.in" }, 4.25);
+      tl.to(["#i-title", "#i-date", "#i-kick", "#sun"], { opacity: 0, y: -60, duration: 0.35, ease: "power2.in" }, 4.2);
+      tl.to(["#anchor", "#anchor-glow"], { opacity: 0, y: 300, duration: 0.45, ease: "power2.in" }, 4.25);
+      tl.to("#strap", { opacity: 0, x: -200, duration: 0.3, ease: "power2.in" }, 4.2);
+
+      // header, avatar, ticker
+      tl.fromTo("#header", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.4, ease: "power3.out" }, 4.6);
+      tl.fromTo("#avatar", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(2.5)" }, 4.75);
+      tl.fromTo("#prog", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 4.8);
+      tl.fromTo("#ticker", { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 4.7);
+      tl.fromTo("#t-run", { xPercent: 0 }, { xPercent: -50, duration: 22, ease: "none", repeat: 1 }, 4.7);
+      tl.fromTo("#h-tag i", { opacity: 1 }, { opacity: 0.2, duration: 0.5, yoyo: true, repeat: 45, ease: "sine.inOut" }, 4.6);
+
+      // index
+      tl.fromTo("#index", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 4.9);
+      tl.fromTo("#ix0", { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.8)" }, 5.25);
+      tl.fromTo("#ix1", { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.8)" }, 5.7);
+      tl.to("#index", { opacity: 0, y: -40, duration: 0.35, ease: "power2.in" }, 8.15);
+
+      // slides
+      const S = [8.6, 17.6, 26.6, 35.6], END = 44.6;
+      const slideIn = (k) => {
+        const t = S[k], next = S[k + 1] || END;
+        tl.fromTo("#s" + k, { opacity: 0, x: 160 }, { opacity: 1, x: 0, duration: 0.45, ease: "power3.out" }, t);
+        tl.fromTo(`#s${k} .s-emo`, { scale: 0.3, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2.5)", immediateRender: false }, t + 0.1);
+        tl.fromTo("#pg" + k, { scaleX: 0 }, { scaleX: 1, duration: next - t, ease: "none" }, t);
+        tl.to("#s" + k, { opacity: 0, x: -160, duration: 0.3, ease: "power2.in" }, next - 0.25);
+      };
+      const pop = (sel, t) => tl.fromTo(sel, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.8)" }, t);
+      [0, 1, 2, 3].forEach(slideIn);
+      tl.fromTo("#s0 .s-head", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out", immediateRender: false }, 8.95);
+      pop("#s0p0", 10.2); pop("#s0p1", 12.4); pop("#s0p2", 14.6);
+      ["#s1t0", "#s1t1", "#s1t2"].forEach((s, i) => tl.fromTo(s, { opacity: 0, y: 40, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(2)" }, 18.0 + i * 0.25));
+      pop("#s1p0", 19.2); pop("#s1p1", 20.9); pop("#s1p2", 22.4);
+      tl.fromTo("#k1", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(2)" }, 23.8);
+      tl.fromTo("#s2 .s-head", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out", immediateRender: false }, 26.95);
+      tl.fromTo("#s2q", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.8)" }, 27.8);
+      pop("#s2p0", 30.2); pop("#s2p1", 32.2);
+      ["#s3t0", "#s3t1", "#s3t2"].forEach((s, i) => tl.fromTo(s, { opacity: 0, y: 40, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(2)" }, 36.0 + i * 0.25));
+      const sb = { v: 12.2 };
+      tl.fromTo(sb, { v: 12.2 }, { v: 12.2775, duration: 1.0, ease: "power3.out",
+        onUpdate: () => { document.getElementById("sbv").textContent = sb.v.toFixed(4); } }, 36.25);
+      pop("#s3p0", 37.8); pop("#s3p1", 39.6);
+      tl.fromTo("#k3", { opacity: 0, y: 40, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(2)" }, 41.6);
+
+      // recap
+      tl.fromTo("#recap", { opacity: 0 }, { opacity: 1, duration: 0.3 }, END);
+      tl.fromTo("#rc0", { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.45, ease: "back.out(1.6)" }, END + 0.35);
+      tl.fromTo("#rc1", { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.45, ease: "back.out(1.6)" }, END + 0.85);
+      tl.to(["#recap", "#header", "#prog", "#avatar", "#ticker"], { opacity: 0, duration: 0.4, ease: "power2.in" }, END + 5.4);
+
+      // outro
+      const O = END + 5.8;
+      tl.set("#outro", { opacity: 1 }, O);
+      tl.fromTo("#o-pre", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, O + 0.1);
+      tl.fromTo("#o-url", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, O + 0.25);
+      tl.fromTo("#o-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, O + 0.8);
+      tl.fromTo("#o-dis", { opacity: 0 }, { opacity: 1, duration: 0.4 }, O + 1.1);
+      tl.fromTo("#anchor-glow", { opacity: 0, y: 0, scale: 0.6 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power2.out", immediateRender: false }, O + 0.2);
+      tl.fromTo("#anchor", { opacity: 0, y: 300 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out", immediateRender: false }, O + 0.3);
+      tl.to("#o-url", { scale: 1.05, duration: 0.45, yoyo: true, repeat: 3, ease: "sine.inOut" }, O + 1.3);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
