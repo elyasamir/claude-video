@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="ms" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@500;600;700;800&display=block" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #060b1a; --ink: #ffffff; --muted: #9fb0d4; --line: rgba(255,255,255,0.16);
+        --red: #e11d48; --up: #22c55e; --down: #ef4444; --gold: #facc15; --sun: #fb923c;
+        --head: "Oswald", Arial, sans-serif; --body: "Inter", "Helvetica Neue", Arial, sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: var(--body); color: var(--ink); background: #000; }
+      #feed { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #feed video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+
+      /* top band (the recording has black here) */
+      #top { position: absolute; left: 0; top: 0; width: 1080px; height: 280px;
+        background: radial-gradient(800px 300px at 80% 0%, #1a2c63 0%, rgba(26,44,99,0) 70%), linear-gradient(180deg, #0c1733, #060b1a); }
+      #top .live { position: absolute; left: 50px; top: 90px; display: inline-flex; align-items: center; gap: 12px; padding: 6px 18px; background: var(--red);
+        font-family: var(--head); font-weight: 700; font-size: 32px; letter-spacing: 0.08em; }
+      #top .live i { width: 16px; height: 16px; border-radius: 50%; background: #fff; display: block; }
+      #top .t { position: absolute; left: 50px; top: 150px; font-family: var(--head); font-weight: 700; font-size: 64px; line-height: 1; }
+      #top .t span { color: var(--gold); }
+      #top .d { position: absolute; right: 50px; top: 100px; text-align: right; font-size: 30px; font-weight: 700; color: var(--muted); line-height: 1.3; }
+      #top .d b { display: block; font-family: var(--head); font-size: 44px; color: #fff; }
+      #edge { position: absolute; left: 0; top: 276px; width: 1080px; height: 6px; background: linear-gradient(90deg, var(--red), var(--gold)); transform-origin: 0 50%; }
+
+      /* chips over the webcam */
+      .chip { position: absolute; display: inline-flex; align-items: center; gap: 14px; padding: 14px 24px; border-radius: 18px;
+        background: rgba(6,11,26,0.88); border: 2px solid var(--line); box-shadow: 0 14px 30px rgba(0,0,0,0.45); opacity: 0; white-space: nowrap; }
+      .chip b { font-family: var(--head); font-weight: 700; font-size: 46px; line-height: 1; }
+      .chip small { display: block; font-size: 28px; font-weight: 700; color: var(--muted); }
+      .chip .ic { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 38px; font-family: var(--head); font-weight: 700; }
+
+      /* cards over the article */
+      .card { position: absolute; left: 60px; width: 960px; border-radius: 30px; padding: 34px 38px 38px; opacity: 0;
+        background: rgba(6,11,26,0.94); border: 2px solid var(--line); box-shadow: 0 30px 70px rgba(0,0,0,0.55); }
+      .card .k { font-size: 28px; font-weight: 800; letter-spacing: 0.16em; color: var(--sun); }
+      .card h2 { margin-top: 12px; font-family: var(--head); font-weight: 700; font-size: 64px; line-height: 1.08; }
+      .card h2 span { color: var(--gold); }
+      .card .src { display: inline-block; margin-top: 16px; padding: 5px 14px; border-radius: 10px; background: rgba(255,255,255,0.1); font-size: 28px; font-weight: 700; color: #dbe4ff; }
+      .flow { display: flex; align-items: stretch; gap: 14px; margin-top: 26px; }
+      .fs { flex: 1; padding: 22px 16px 24px; border-radius: 22px; text-align: center; background: rgba(255,255,255,0.06); border: 2px solid var(--line); opacity: 0; }
+      .fs .e { font-size: 64px; line-height: 1; }
+      .fs b { display: block; margin-top: 12px; font-family: var(--head); font-weight: 700; font-size: 38px; line-height: 1.1; }
+      .fs small { display: block; margin-top: 6px; font-size: 28px; font-weight: 600; color: var(--muted); line-height: 1.2; }
+      .fs.g { border-color: var(--up); background: rgba(34,197,94,0.14); }
+      .fs.g b { color: #86efac; }
+      .arr { align-self: center; font-family: var(--head); font-weight: 700; font-size: 54px; color: var(--gold); opacity: 0; }
+      .pair { display: flex; align-items: center; justify-content: center; gap: 26px; margin-top: 28px; }
+      .pill { padding: 22px 30px; border-radius: 22px; background: rgba(255,255,255,0.07); border: 2px solid var(--line); text-align: center; opacity: 0; }
+      .pill .e { font-size: 60px; line-height: 1; }
+      .pill b { display: block; margin-top: 10px; font-family: var(--head); font-weight: 700; font-size: 44px; }
+      .link { font-family: var(--head); font-weight: 700; font-size: 70px; color: var(--gold); opacity: 0; }
+      .verdict { margin-top: 26px; display: flex; align-items: center; gap: 22px; padding: 20px 28px; border-radius: 22px; background: rgba(34,197,94,0.14); border: 2px solid var(--up); opacity: 0; }
+      .verdict i { width: 72px; height: 72px; border-radius: 50%; background: var(--up); color: #052e14; font-style: normal; font-family: var(--head); font-weight: 700; font-size: 46px; display: flex; align-items: center; justify-content: center; flex: none; }
+      .verdict b { font-family: var(--head); font-weight: 700; font-size: 50px; color: #bbf7d0; }
+
+      /* headline highlight on the recording (screen pixels) */
+      .hl { position: absolute; border-radius: 12px; border: 4px solid var(--gold); box-shadow: 0 0 24px rgba(250,204,21,0.9); opacity: 0; }
+
+      /* section label */
+      #sect { position: absolute; left: 0; top: 300px; height: 64px; display: flex; align-items: center; opacity: 0; }
+      #sect b { display: block; padding: 0 24px; height: 64px; line-height: 64px; background: var(--gold); color: #111; font-family: var(--head); font-weight: 700; font-size: 36px; letter-spacing: 0.06em; }
+      #sect span { display: block; padding: 0 24px; height: 64px; line-height: 64px; background: rgba(6,11,26,0.9); font-family: var(--head); font-weight: 600; font-size: 36px; }
+
+      /* captions */
+      #caps { position: absolute; left: 60px; top: 1700px; width: 960px; height: 160px; }
+      .cap { position: absolute; left: 50%; top: 0; transform: translateX(-50%); width: max-content; max-width: 960px; text-align: center; opacity: 0;
+        padding: 12px 26px 16px; border-radius: 24px; background: rgba(6,11,26,0.9); border: 2px solid rgba(255,255,255,0.14);
+        font-weight: 800; font-size: 50px; line-height: 1.16; }
+      .cap .k { color: var(--gold); } .cap .r { color: #f87171; } .cap .g { color: #4ade80; }
+
+      /* outro */
+      #outro { position: absolute; inset: 0; opacity: 0; background: radial-gradient(1100px 800px at 80% 10%, #1a2c63 0%, rgba(26,44,99,0) 60%), linear-gradient(180deg, #0c1733, #060b1a); }
+      #o-pre { position: absolute; left: 0; top: 760px; width: 1080px; text-align: center; font-size: 40px; font-weight: 700; color: var(--muted); }
+      #o-url { position: absolute; left: 50%; top: 840px; transform: translateX(-50%); display: flex; align-items: center; gap: 22px; padding: 30px 50px 30px 34px; border-radius: 999px; background: #fff; color: #0b1020;
+        box-shadow: 0 30px 80px rgba(225,29,72,0.35), 0 0 0 6px rgba(225,29,72,0.5); white-space: nowrap; }
+      #o-url .globe { width: 76px; height: 76px; border-radius: 50%; background: #16a34a; position: relative; flex: none; box-shadow: inset 0 0 0 5px #15803d; }
+      #o-url .globe::before, #o-url .globe::after { content: ""; position: absolute; border: 4px solid #fff; border-radius: 50%; }
+      #o-url .globe::before { left: 22px; right: 22px; top: 8px; bottom: 8px; }
+      #o-url .globe::after { left: 8px; right: 8px; top: 30px; bottom: 30px; border-radius: 4px; border-width: 4px 0; }
+      #o-url b { font-size: 84px; font-weight: 800; letter-spacing: -0.02em; }
+      #o-url b span { color: #16a34a; }
+      #o-sub { position: absolute; left: 90px; top: 1050px; width: 900px; text-align: center; font-size: 40px; font-weight: 800; line-height: 1.25; }
+      #o-sub em { font-style: normal; color: var(--gold); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="40.3" data-width="1080" data-height="1920">
+      <div id="feed">
+        <!-- jump-cut edit of the live clip (assets/cuts.json): pauses, noise and the cut-off last line removed -->
+        <video id="v0" class="clip" src="assets/raw.mp4" data-start="0.000" data-duration="4.650" data-media-start="1.2" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v1" class="clip" src="assets/raw.mp4" data-start="4.650" data-duration="4.320" data-media-start="11.17" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v2" class="clip" src="assets/raw.mp4" data-start="8.970" data-duration="4.440" data-media-start="16.42" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v3" class="clip" src="assets/raw.mp4" data-start="13.410" data-duration="1.940" data-media-start="21.52" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v4" class="clip" src="assets/raw.mp4" data-start="15.350" data-duration="0.830" data-media-start="23.71" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v5" class="clip" src="assets/raw.mp4" data-start="16.180" data-duration="2.210" data-media-start="25.41" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v6" class="clip" src="assets/raw.mp4" data-start="18.390" data-duration="1.540" data-media-start="29.14" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v7" class="clip" src="assets/raw.mp4" data-start="19.930" data-duration="0.620" data-media-start="31.18" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v8" class="clip" src="assets/raw.mp4" data-start="20.550" data-duration="1.930" data-media-start="32.56" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v9" class="clip" src="assets/raw.mp4" data-start="22.480" data-duration="2.040" data-media-start="35.49" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v10" class="clip" src="assets/raw.mp4" data-start="24.520" data-duration="4.200" data-media-start="42.42" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.03" playsinline></video>
+        <video id="v11" class="clip" src="assets/raw.mp4" data-start="28.720" data-duration="6.770" data-media-start="49.05" data-has-audio="true" data-fade-in="0.02" data-fade-out="0.2" playsinline></video>
+        <div class="hl" id="hl-head" style="left:140px; top:950px; width:820px; height:58px"></div>
+      </div>
+
+      <div id="top" data-layout-allow-safe-zone>
+        <div class="live"><i></i>LIVE</div>
+        <div class="t">Analisis <span>Pasaran</span></div>
+        <div class="d">Khamis<b>26 Nov 2026</b></div>
+      </div>
+      <div id="edge"></div>
+      <div id="sect" data-layout-allow-safe-zone><b>SAWIT</b><span>Berita utama hari ini</span></div>
+
+      <!-- webcam chips -->
+      <div class="chip" id="c-open" style="left:560px; top:330px"><div class="ic" style="background:var(--gold); color:#111">🕥</div><div><small>FCPO dibuka</small><b>10:30 PAGI</b></div></div>
+      <div class="chip" id="c-dce" style="left:560px; top:470px"><div class="ic" style="background:var(--down)">▼</div><div><small>Kejar harga</small><b>DALIAN NEGATIF</b></div></div>
+
+      <!-- article cards -->
+      <div class="card" id="k-head" style="top:1040px">
+        <div class="k">BERITA UTAMA · SAWIT</div>
+        <h2>🇮🇩 Indonesia cadang <span>caj eksport baharu</span></h2>
+        <div class="src">Reuters · 0.5% nilai eksport melalui agensi DSI</div>
+      </div>
+      <div class="card" id="k-why" style="top:1040px">
+        <div class="k">KENAPA?</div>
+        <h2>💰 Nak <span>untung</span>, tambah hasil eksport</h2>
+      </div>
+      <div class="card" id="k-flow" style="top:1000px">
+        <div class="k">KESAN KEPADA PEMBELI</div>
+        <div class="flow">
+          <div class="fs" id="f1"><div class="e">🇮🇩</div><b>Caj eksport</b><small>Indonesia naik</small></div>
+          <div class="arr" id="a1">›</div>
+          <div class="fs" id="f2"><div class="e">💸</div><b>Lebih mahal</b><small>sawit Indonesia</small></div>
+          <div class="arr" id="a2">›</div>
+          <div class="fs g" id="f3"><div class="e">🇲🇾</div><b>Cari Malaysia</b><small>pembeli beralih</small></div>
+        </div>
+      </div>
+      <div class="card" id="k-gold" style="top:1000px">
+        <div class="k">SOALAN: KOMODITI LAIN</div>
+        <div class="pair">
+          <div class="pill" id="g1"><div class="e">🥇</div><b>EMAS</b></div>
+          <div class="link" id="gl">⇄</div>
+          <div class="pill" id="g2"><div class="e">🏦</div><b>KADAR FAEDAH AS</b></div>
+        </div>
+        <div class="verdict" id="gv"><i>✓</i><b>Sangat-sangat berkait</b></div>
+      </div>
+
+      <div id="caps"></div>
+
+      <div id="outro" data-layout-allow-safe-zone>
+        <div id="o-pre">Analisis pasaran setiap hari di</div>
+        <div id="o-url"><div class="globe"></div><b>trader<span>sawit</span>.com</b></div>
+        <div id="o-sub">Follow untuk <em>live analisis</em> seterusnya</div>
+      </div>
+
+      <!-- sound effects (original voice kept on the clips) -->
+      <audio id="s0" src="assets/sfx/whoosh.wav" data-start="0" data-duration="0.55" data-volume="0.3"></audio>
+      <audio id="s1" src="assets/sfx/pop.wav" data-start="0.45" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="s2" src="assets/sfx/pop.wav" data-start="3.4" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="s3" src="assets/sfx/blip.wav" data-start="4.7" data-duration="0.32" data-volume="0.35"></audio>
+      <audio id="s4" src="assets/sfx/hit.wav" data-start="10.15" data-duration="0.9" data-volume="0.3"></audio>
+      <audio id="s5" src="assets/sfx/ding.wav" data-start="13.5" data-duration="1.6" data-volume="0.22"></audio>
+      <audio id="s6" src="assets/sfx/swipe.wav" data-start="16.05" data-duration="0.28" data-volume="0.3"></audio>
+      <audio id="s7" src="assets/sfx/pop.wav" data-start="18.5" data-duration="0.16" data-volume="0.3"></audio>
+      <audio id="s8" src="assets/sfx/swipe.wav" data-start="20.4" data-duration="0.28" data-volume="0.3"></audio>
+      <audio id="s9" src="assets/sfx/pop.wav" data-start="21.0" data-duration="0.16" data-volume="0.28"></audio>
+      <audio id="s10" src="assets/sfx/pop.wav" data-start="22.05" data-duration="0.16" data-volume="0.28"></audio>
+      <audio id="s11" src="assets/sfx/ding.wav" data-start="23.9" data-duration="1.6" data-volume="0.25"></audio>
+      <audio id="s12" src="assets/sfx/whoosh.wav" data-start="24.5" data-duration="0.55" data-volume="0.3"></audio>
+      <audio id="s13" src="assets/sfx/blip.wav" data-start="28.6" data-duration="0.32" data-volume="0.35"></audio>
+      <audio id="s14" src="assets/sfx/pop.wav" data-start="31.0" data-duration="0.16" data-volume="0.28"></audio>
+      <audio id="s15" src="assets/sfx/ding.wav" data-start="33.3" data-duration="1.6" data-volume="0.28"></audio>
+      <audio id="s16" src="assets/sfx/whoosh.wav" data-start="35.35" data-duration="0.55" data-volume="0.4"></audio>
+      <audio id="s17" src="assets/sfx/impact.wav" data-start="35.6" data-duration="1.2" data-volume="0.35"></audio>
+    </div>
+
+    <script>
+      // captions (hand-checked against the transcript; "Goal" -> Gold, "dalihan" -> Dalian, "features" -> futures)
+      const CAPS = [
+        [0.0, 1.8, 'Kemudian <span class="k">FCPO</span> buka pukul <span class="k">10:30</span>'],
+        [1.82, 3.76, 'Jadi FCPO nak kena kejar harga <span class="k">Dalian</span>'],
+        [3.78, 4.66, 'yang jadi <span class="r">negatif</span>'],
+        [4.68, 6.6, 'So untuk <span class="k">palm oil</span>,'],
+        [6.62, 9.6, 'saya rasa ini saja berita yang menarik hari ni'],
+        [10.1, 13.44, 'Berita menarik: <span class="k">Indonesia</span> tengah propose'],
+        [13.46, 15.9, '<span class="k">new export charge</span>'],
+        [16.08, 18.44, 'Kenapa dia nak propose <span class="k">export charge</span>?'],
+        [18.46, 19.94, 'Nak <span class="k">untung</span> lah kan'],
+        [19.96, 22.66, 'Okay, so kalau jadi <span class="r">mahal</span>'],
+        [22.68, 24.54, 'pembeli akan cari <span class="g">Malaysia</span> lah'],
+        [24.56, 27.2, 'So next, kita akan tengok juga'],
+        [27.26, 28.54, '<span class="k">futures</span> yang lain'],
+        [28.56, 32.74, '<span class="k">Gold</span> naik turun harga berkait dengan <span class="k">interest rate US</span>, betul?'],
+        [32.76, 35.46, 'Memang berkait, <span class="g">sangat-sangat berkait</span>'],
+      ];
+      const capRoot = document.getElementById("caps");
+      CAPS.forEach((c, i) => { const d = document.createElement("div"); d.className = "cap"; d.id = "cap" + i; d.innerHTML = c[2]; capRoot.appendChild(d); });
+
+      const tl = gsap.timeline({ paused: true });
+      CAPS.forEach(([a, b], i) => {
+        tl.fromTo("#cap" + i, { opacity: 0, y: 20, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.16, ease: "back.out(2)" }, a);
+        tl.to("#cap" + i, { opacity: 0, duration: 0.06 }, b - 0.06);
+      });
+
+      // top band
+      tl.fromTo("#top .live", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, 0.05);
+      tl.fromTo("#top .t", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 0.15);
+      tl.fromTo("#top .d", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, 0.2);
+      tl.fromTo("#edge", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power3.out" }, 0.1);
+      tl.fromTo("#top .live i", { opacity: 1 }, { opacity: 0.2, duration: 0.5, yoyo: true, repeat: 69, ease: "sine.inOut" }, 0.4);
+
+      const chipIn = (s, t, out) => { tl.fromTo(s, { opacity: 0, x: 80 }, { opacity: 1, x: 0, duration: 0.3, ease: "back.out(2)" }, t); tl.to(s, { opacity: 0, x: 40, duration: 0.2 }, out); };
+      const cardIn = (s, t, out) => { tl.fromTo(s, { opacity: 0, y: 60, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: "back.out(1.7)" }, t); tl.to(s, { opacity: 0, y: 30, duration: 0.25, ease: "power2.in" }, out); };
+
+      // FCPO open / Dalian
+      chipIn("#c-open", 0.4, 4.5); chipIn("#c-dce", 3.35, 4.5);
+      // palm oil section label
+      tl.fromTo("#sect", { opacity: 0, x: -200 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out" }, 4.7);
+      tl.to("#sect", { opacity: 0, x: -120, duration: 0.25 }, 24.4);
+      // headline on the recording, then the headline card
+      tl.fromTo("#hl-head", { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(2)" }, 10.4);
+      tl.to("#hl-head", { opacity: 0, duration: 0.2 }, 15.9);
+      cardIn("#k-head", 10.1, 15.95);
+      cardIn("#k-why", 16.1, 19.9);
+      // flow
+      cardIn("#k-flow", 20.0, 24.45);
+      [["#f1", 20.3], ["#a1", 21.3], ["#f2", 21.5], ["#a2", 22.4], ["#f3", 22.6]].forEach(([s, t]) =>
+        tl.fromTo(s, { opacity: 0, y: 30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(2.2)" }, t));
+      tl.to("#f3", { scale: 1.06, duration: 0.35, yoyo: true, repeat: 2, ease: "sine.inOut" }, 23.3);
+      // next: other futures
+      tl.set("#sect b", { textContent: "SETERUSNYA" }, 24.5);
+      tl.set("#sect span", { textContent: "Niaga hadapan lain" }, 24.5);
+      tl.fromTo("#sect", { opacity: 0, x: -200 }, { opacity: 1, x: 0, duration: 0.35, ease: "power3.out", immediateRender: false }, 24.6);
+      tl.to("#sect", { opacity: 0, x: -120, duration: 0.25 }, 35.2);
+      // gold vs US rates
+      cardIn("#k-gold", 28.6, 35.25);
+      tl.fromTo("#g1", { opacity: 0, x: -60 }, { opacity: 1, x: 0, duration: 0.35, ease: "back.out(2)" }, 29.2);
+      tl.fromTo("#g2", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.35, ease: "back.out(2)" }, 30.9);
+      tl.fromTo("#gl", { opacity: 0, scale: 0.3 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(3)" }, 31.5);
+      tl.fromTo("#gv", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(2)" }, 33.25);
+
+      // outro
+      tl.to(["#top", "#edge", "#caps"], { opacity: 0, duration: 0.3 }, 35.3);
+      tl.fromTo("#outro", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 35.4);
+      tl.fromTo("#o-pre", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 35.6);
+      tl.fromTo("#o-url", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(2.2)" }, 35.75);
+      tl.fromTo("#o-sub", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 36.3);
+      tl.to("#o-url", { scale: 1.05, duration: 0.45, yoyo: true, repeat: 3, ease: "sine.inOut" }, 36.8);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
